@@ -27,13 +27,14 @@ function RootLayoutNav() {
   if (loading) {
     return (
       <View style={styles.loading}>
+        <StatusBar style="light" />
         <ActivityIndicator size="large" color={colors.petrol500} />
       </View>
     );
   }
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -42,11 +43,12 @@ function RootLayoutNav() {
           animation: 'slide_from_right',
         }}
       >
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="confirm" options={{ headerShown: false, presentation: 'card' }} />
       </Stack>
-    </>
+    </View>
   );
 }
 
