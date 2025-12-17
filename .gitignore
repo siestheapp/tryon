@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.expo/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+*.ipa
+*.apk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Expo
+.expo-shared/
+
+# Sensitive data
+*.sql
+*.dump
+
+# Large data files (keep structure, ignore contents)
+data/scrapes/**/*.html
+data/scrapes/**/*.json
+!data/scrapes/**/README.md
+
+# Test artifacts
+coverage/
+.pytest_cache/
