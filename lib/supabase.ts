@@ -32,6 +32,10 @@ export interface ProductLookupResult {
 // Types for try-on
 export type FitRating = 'too_small' | 'just_right' | 'too_large';
 
+// Body-part fit ratings
+export type BodyPartFit = 'tight' | 'good' | 'loose'; // for chest, waist
+export type LengthFit = 'short' | 'good' | 'long';    // for sleeves, length
+
 export interface SaveTryonParams {
   product_id: number;
   size_label: string;
@@ -39,6 +43,11 @@ export interface SaveTryonParams {
   notes?: string;
   photo_path?: string;
   variant_id?: number;
+  // Body-part feedback (only when overall_fit !== 'just_right')
+  chest_fit?: BodyPartFit;
+  waist_fit?: BodyPartFit;
+  sleeve_fit?: LengthFit;
+  length_fit?: LengthFit;
 }
 
 export interface SaveTryonResult {
@@ -81,13 +90,18 @@ export async function saveTryon(params: SaveTryonParams): Promise<SaveTryonResul
     p_notes: params.notes ?? null,
     p_photo_path: params.photo_path ?? null,
     p_variant_id: params.variant_id ?? null,
+    // Body-part feedback (optional)
+    p_chest_fit: params.chest_fit ?? null,
+    p_waist_fit: params.waist_fit ?? null,
+    p_sleeve_fit: params.sleeve_fit ?? null,
+    p_length_fit: params.length_fit ?? null,
   });
-  
+
   if (error) {
     console.error('Save tryon error:', error);
     throw error;
   }
-  
+
   return data as SaveTryonResult;
 }
 

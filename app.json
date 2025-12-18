@@ -1,21 +1,27 @@
 {
   "expo": {
-    "name": "TryOn",
+    "name": "freestylefit",
     "slug": "tryon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "scheme": "tryon",
-    "newArchEnabled": true,
+    "scheme": "freestylefit",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B0F14"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.tryon.app"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.davey.freestylefit",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "NSCameraUsageDescription": "freestylefit needs camera access to take photos of your try-ons.",
+        "NSPhotoLibraryUsageDescription": "freestylefit needs photo library access to save your try-on photos.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +29,7 @@
         "backgroundColor": "#0B0F14"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.tryon.app"
+      "package": "com.davey.freestylefit"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -34,6 +40,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d8bae70c-0701-4ee0-bc37-3d254286ee76"
+      },
+      "router": {}
+    },
+    "owner": "daveys241"
   }
 }

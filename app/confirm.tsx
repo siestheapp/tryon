@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, typography, components } from '../theme/tokens';
-import { saveTryon, FitRating } from '../lib/supabase';
+import { saveTryon, FitRating, BodyPartFit, LengthFit } from '../lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -23,6 +23,22 @@ const FIT_OPTIONS: { value: FitRating; label: string; emoji: string }[] = [
   { value: 'too_small', label: 'Too Small', emoji: '😤' },
   { value: 'just_right', label: 'Perfect', emoji: '😍' },
   { value: 'too_large', label: 'Too Large', emoji: '🫠' },
+];
+
+// Body-part feedback options (shown only when fit is not perfect)
+type BodyPartKey = 'chest' | 'waist' | 'sleeves' | 'length';
+
+interface BodyPartOption {
+  key: BodyPartKey;
+  label: string;
+  icon: string;
+}
+
+const BODY_PART_OPTIONS: BodyPartOption[] = [
+  { key: 'chest', label: 'Chest/Shoulders', icon: '👔' },
+  { key: 'waist', label: 'Waist', icon: '📏' },
+  { key: 'sleeves', label: 'Sleeves/Arms', icon: '💪' },
+  { key: 'length', label: 'Length', icon: '📐' },
 ];
 
 interface ColorOption {
@@ -71,12 +87,21 @@ export default function ConfirmScreen() {
   const [customColorName, setCustomColorName] = useState('');
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedFit, setSelectedFit] = useState<FitRating | null>(null);
+  const [selectedBodyParts, setSelectedBodyParts] = useState<Set<BodyPartKey>>(new Set());
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Determine if we need the color step
+  // Determine steps dynamically
+  // Body-parts step only shows when fit is NOT 'just_right'
   const hasColors = colorOptions.length > 0;
-  const steps = hasColors ? ['color', 'size', 'fit'] : ['size', 'fit'];
+  const needsBodyParts = selectedFit !== null && selectedFit !== 'just_right';
+
+  const steps = [
+    ...(hasColors ? ['color'] : []),
+    'size',
+    'fit',
+    ...(needsBodyParts ? ['body_parts'] : []),
+  ];
   const totalSteps = steps.length;
 
   const animateToStep = (step: number) => {
@@ -100,7 +125,23 @@ export default function ConfirmScreen() {
     if (stepType === 'fit') {
       return selectedFit;
     }
+    if (stepType === 'body_parts') {
+      // Body parts is optional - can always proceed (even with none selected)
+      return true;
+    }
     return false;
+  };
+
+  const toggleBodyPart = (key: BodyPartKey) => {
+    setSelectedBodyParts(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
   };
 
   const handleNext = () => {
@@ -139,12 +180,31 @@ export default function ConfirmScreen() {
         finalNotes = finalNotes ? `${colorNote}\n${finalNotes}` : colorNote;
       }
 
+      // Determine body-part fit values based on overall fit and selections
+      // For "too_small": selected parts are "tight" (chest/waist) or "short" (sleeves/length)
+      // For "too_large": selected parts are "loose" (chest/waist) or "long" (sleeves/length)
+      const getBodyPartValue = (key: BodyPartKey): BodyPartFit | LengthFit | undefined => {
+        if (!selectedBodyParts.has(key)) return undefined;
+        if (selectedFit === 'too_small') {
+          return (key === 'chest' || key === 'waist') ? 'tight' : 'short';
+        }
+        if (selectedFit === 'too_large') {
+          return (key === 'chest' || key === 'waist') ? 'loose' : 'long';
+        }
+        return undefined;
+      };
+
       await saveTryon({
         product_id: productId,
         size_label: selectedSize,
         overall_fit: selectedFit,
         notes: finalNotes || undefined,
         variant_id: selectedColor?.variant_id,
+        // Body-part feedback
+        chest_fit: getBodyPartValue('chest') as BodyPartFit | undefined,
+        waist_fit: getBodyPartValue('waist') as BodyPartFit | undefined,
+        sleeve_fit: getBodyPartValue('sleeves') as LengthFit | undefined,
+        length_fit: getBodyPartValue('length') as LengthFit | undefined,
       });
 
       router.replace('/(tabs)/history');
@@ -153,7 +213,7 @@ export default function ConfirmScreen() {
     } finally {
       setSaving(false);
     }
-  }, [selectedSize, selectedFit, selectedColor, isOtherColor, customColorName, notes, productId, router]);
+  }, [selectedSize, selectedFit, selectedColor, isOtherColor, customColorName, notes, productId, router, selectedBodyParts]);
 
   // Render functions for each step
   const renderColorStep = () => (
@@ -281,6 +341,39 @@ export default function ConfirmScreen() {
     </KeyboardAvoidingView>
   );
 
+  const renderBodyPartsStep = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepQuestion}>
+        What felt {selectedFit === 'too_small' ? 'tight' : 'loose'}?
+      </Text>
+      <Text style={styles.stepSubtitle}>
+        Select all that apply (optional)
+      </Text>
+      <View style={styles.bodyPartsGrid}>
+        {BODY_PART_OPTIONS.map((option) => (
+          <Pressable
+            key={option.key}
+            style={[
+              styles.bodyPartChip,
+              selectedBodyParts.has(option.key) && styles.bodyPartChipSelected,
+            ]}
+            onPress={() => toggleBodyPart(option.key)}
+          >
+            <Text style={styles.bodyPartIcon}>{option.icon}</Text>
+            <Text
+              style={[
+                styles.bodyPartLabel,
+                selectedBodyParts.has(option.key) && styles.bodyPartLabelSelected,
+              ]}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+
   const renderStep = (stepType: string) => {
     switch (stepType) {
       case 'color':
@@ -289,6 +382,8 @@ export default function ConfirmScreen() {
         return renderSizeStep();
       case 'fit':
         return renderFitStep();
+      case 'body_parts':
+        return renderBodyPartsStep();
       default:
         return null;
     }
@@ -585,6 +680,49 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top',
     paddingTop: spacing.md,
+  },
+  // Body parts grid
+  stepSubtitle: {
+    ...typography.body,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: -spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  bodyPartsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: spacing.md,
+  },
+  bodyPartChip: {
+    width: '45%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: colors.border,
+    gap: spacing.sm,
+  },
+  bodyPartChipSelected: {
+    borderColor: colors.petrol500,
+    backgroundColor: 'rgba(0, 163, 163, 0.1)',
+  },
+  bodyPartIcon: {
+    fontSize: 24,
+  },
+  bodyPartLabel: {
+    ...typography.bodyMedium,
+    color: colors.textSecondary,
+    fontSize: 14,
+    flex: 1,
+  },
+  bodyPartLabelSelected: {
+    color: colors.petrol500,
+    fontWeight: '600',
   },
   // Footer
   footer: {
