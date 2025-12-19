@@ -19,14 +19,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 // Types for product lookup
+export interface SizeOption {
+  label: string;    // e.g., "M-T" (what we save)
+  display: string;  // e.g., "M (Tall)" (what we show)
+}
+
 export interface ProductLookupResult {
   product_id: number;
   brand: string;
   title: string;
   category: string;
   image_url: string | null;
-  sizes: string[];
+  sizes: SizeOption[];
   colors: Array<{ variant_id: number; color_name: string; swatch_url: string | null }>;
+  fits: string[];  // e.g., ["Classic", "Slim", "Tall"]
 }
 
 // Types for try-on

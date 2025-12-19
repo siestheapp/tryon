@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "supabase": {
-      "type": "url",
+      "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=rybsqzlqywjcvoxsymsi",
       "headers": {
         "Authorization": "Bearer sbp_ccfd6b1712b5e0db235a313f6a727ba4eea4a492"
@@ -13,14 +13,6 @@
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "/Users/seandavey/projects/tryon"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest",
-        "--headless"
       ]
     }
   }

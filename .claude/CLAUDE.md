@@ -45,7 +45,7 @@ This file keeps all AI assistants in sync. Update it when you complete significa
 
 **Active Work:** App Store submission (5-day deadline)
 
-**Last Updated:** 2024-12-18 by Claude Code (VS Code Extension)
+**Last Updated:** 2024-12-19 by Claude Code (Terminal)
 
 ---
 
@@ -53,7 +53,28 @@ This file keeps all AI assistants in sync. Update it when you complete significa
 
 Record significant changes here so any AI can catch up quickly.
 
+### 2024-12-19
+
+**[Claude Code - Terminal] - Session 4**
+- Fixed product images not displaying (found 48/196 products missing images - Uniqlo, rag & bone, Banana Republic)
+- Fixed "105 colors available" bug - deduplicated colors in `product_lookup` SQL function (was showing color+fit combos)
+- Fixed low-quality swatches - upgraded from `$pdp_sw20$` (20px) to `$pdp_sw100$` (100px), increased UI size to 60x60
+- Fixed Uniqlo scraper - added `extract_images()` and `replace_variant_images()` functions
+- Added fit type selection to try-on wizard (Color → **Fit Type** → Size → Rating)
+- Fixed size display showing `[object Object]` - sizes now use `SizeOption` with `label`/`display` properties
+- Updated `product_lookup` to return `fits` array and human-readable size names (e.g., "M (Tall)" instead of "M-T")
+- Fixed hooks config - moved from custom `hooks.json` to proper `settings.local.json` format
+- **Files modified:** `app/confirm.tsx`, `app/(tabs)/scan.tsx`, `lib/supabase.ts`, `.claude/settings.local.json`
+- **DB migrations:** `fix_product_lookup_dedupe_colors`, `add_fits_to_product_lookup`
+
 ### 2024-12-18
+
+**[Claude Code - Terminal] - Session 3**
+- Fixed `.mcp.json` - changed `type: "url"` to `type: "http"` for Supabase (was causing "invalid settings file" error)
+- Removed playwright and github MCP servers to reduce context usage (~46K → ~13K tokens)
+- Fixed broken hookify system - hooks were failing silently due to missing Python modules
+- Simplified hooks to actually work: stop.py now shows sync reminder, others are placeholders
+- Cleaned up unused hook files
 
 **[Claude Code - VS Code Extension] - Session 2**
 - Created `/sync` command to auto-update this file at end of sessions
@@ -93,8 +114,11 @@ Record significant changes here so any AI can catch up quickly.
 1. **Database:** 14 unindexed foreign keys (see Supabase advisor)
 2. **Database:** Duplicate indexes to clean up
 3. **Database:** RLS policies need `(select auth.uid())` optimization
-4. **Security:** GitHub token exposed - needs regeneration
+4. **Security:** GitHub token exposed - needs regeneration (GitHub MCP removed for now)
 5. **Security:** `pg_trgm` extension in public schema - move to extensions
+6. **Scrapers:** Banana Republic scraper uses wrong schema (`public.products` instead of `core`) - needs architectural fix
+7. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
+8. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
 
 ---
 

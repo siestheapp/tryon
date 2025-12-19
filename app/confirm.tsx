@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, typography, components } from '../theme/tokens';
-import { saveTryon, FitRating, BodyPartFit, LengthFit } from '../lib/supabase';
+import { saveTryon, FitRating, BodyPartFit, LengthFit, SizeOption } from '../lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -47,20 +47,6 @@ interface ColorOption {
   swatch_url: string | null;
 }
 
-// Sort sizes intelligently (numeric first, then alpha)
-function sortSizes(sizes: string[]): string[] {
-  return [...sizes].sort((a, b) => {
-    const numA = parseFloat(a);
-    const numB = parseFloat(b);
-    if (!isNaN(numA) && !isNaN(numB)) {
-      return numA - numB;
-    }
-    if (!isNaN(numA)) return -1;
-    if (!isNaN(numB)) return 1;
-    return a.localeCompare(b);
-  });
-}
-
 export default function ConfirmScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
@@ -71,10 +57,12 @@ export default function ConfirmScreen() {
     image_url: string;
     sizes: string;
     colors: string;
+    fits: string;
   }>();
 
-  const sizes: string[] = sortSizes(params.sizes ? JSON.parse(params.sizes) : []);
+  const sizeOptions: SizeOption[] = params.sizes ? JSON.parse(params.sizes) : [];
   const colorOptions: ColorOption[] = params.colors ? JSON.parse(params.colors) : [];
+  const fitOptions: string[] = params.fits ? JSON.parse(params.fits) : [];
   const productId = params.product_id ? parseInt(params.product_id, 10) : 0;
 
   // Wizard state
@@ -85,8 +73,9 @@ export default function ConfirmScreen() {
   const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
   const [isOtherColor, setIsOtherColor] = useState(false);
   const [customColorName, setCustomColorName] = useState('');
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedFit, setSelectedFit] = useState<FitRating | null>(null);
+  const [selectedFitType, setSelectedFitType] = useState<string | null>(null); // Product fit (Classic, Slim, etc.)
+  const [selectedSize, setSelectedSize] = useState<SizeOption | null>(null);
+  const [selectedFit, setSelectedFit] = useState<FitRating | null>(null); // User's fit rating (too_small, etc.)
   const [selectedBodyParts, setSelectedBodyParts] = useState<Set<BodyPartKey>>(new Set());
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
@@ -94,10 +83,12 @@ export default function ConfirmScreen() {
   // Determine steps dynamically
   // Body-parts step only shows when fit is NOT 'just_right'
   const hasColors = colorOptions.length > 0;
+  const hasFitTypes = fitOptions.length > 0;
   const needsBodyParts = selectedFit !== null && selectedFit !== 'just_right';
 
   const steps = [
     ...(hasColors ? ['color'] : []),
+    ...(hasFitTypes ? ['fit_type'] : []),
     'size',
     'fit',
     ...(needsBodyParts ? ['body_parts'] : []),
@@ -118,6 +109,9 @@ export default function ConfirmScreen() {
     const stepType = steps[currentStep];
     if (stepType === 'color') {
       return selectedColor || (isOtherColor && customColorName.trim());
+    }
+    if (stepType === 'fit_type') {
+      return selectedFitType;
     }
     if (stepType === 'size') {
       return selectedSize;
@@ -196,7 +190,7 @@ export default function ConfirmScreen() {
 
       await saveTryon({
         product_id: productId,
-        size_label: selectedSize,
+        size_label: selectedSize.label,
         overall_fit: selectedFit,
         notes: finalNotes || undefined,
         variant_id: selectedColor?.variant_id,
@@ -231,7 +225,7 @@ export default function ConfirmScreen() {
           >
             {color.swatch_url ? (
               <Image
-                source={{ uri: color.swatch_url }}
+                source={{ uri: color.swatch_url.replace(/\$pdp_sw\d+\$/, '$pdp_sw100$') }}
                 style={styles.colorSwatchImage}
                 contentFit="cover"
               />
@@ -273,26 +267,53 @@ export default function ConfirmScreen() {
     </View>
   );
 
+  const renderFitTypeStep = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepQuestion}>Which fit type?</Text>
+      <View style={styles.fitTypeGrid}>
+        {fitOptions.map((fit) => (
+          <Pressable
+            key={fit}
+            style={[
+              styles.fitTypeChip,
+              selectedFitType === fit && styles.fitTypeChipSelected,
+            ]}
+            onPress={() => setSelectedFitType(fit)}
+          >
+            <Text
+              style={[
+                styles.fitTypeChipText,
+                selectedFitType === fit && styles.fitTypeChipTextSelected,
+              ]}
+            >
+              {fit}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+
   const renderSizeStep = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepQuestion}>What size did you try?</Text>
       <View style={styles.sizeGrid}>
-        {sizes.map((size) => (
+        {sizeOptions.map((sizeOption) => (
           <Pressable
-            key={size}
+            key={sizeOption.label}
             style={[
               styles.sizeChip,
-              selectedSize === size && styles.sizeChipSelected,
+              selectedSize?.label === sizeOption.label && styles.sizeChipSelected,
             ]}
-            onPress={() => setSelectedSize(size)}
+            onPress={() => setSelectedSize(sizeOption)}
           >
             <Text
               style={[
                 styles.sizeChipText,
-                selectedSize === size && styles.sizeChipTextSelected,
+                selectedSize?.label === sizeOption.label && styles.sizeChipTextSelected,
               ]}
             >
-              {size}
+              {sizeOption.display}
             </Text>
           </Pressable>
         ))}
@@ -378,6 +399,8 @@ export default function ConfirmScreen() {
     switch (stepType) {
       case 'color':
         return renderColorStep();
+      case 'fit_type':
+        return renderFitTypeStep();
       case 'size':
         return renderSizeStep();
       case 'fit':
@@ -566,9 +589,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   colorSwatch: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     borderWidth: 3,
     borderColor: 'transparent',
     overflow: 'hidden',
@@ -613,6 +636,36 @@ const styles = StyleSheet.create({
     ...components.input,
     marginTop: spacing.lg,
     textAlign: 'center',
+  },
+  // Fit type grid (Classic, Slim, Tall, etc.)
+  fitTypeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: spacing.md,
+  },
+  fitTypeChip: {
+    minWidth: 100,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  fitTypeChipSelected: {
+    backgroundColor: colors.petrol500,
+    borderColor: colors.petrol500,
+  },
+  fitTypeChipText: {
+    ...typography.bodyMedium,
+    color: colors.textSecondary,
+    fontSize: 16,
+  },
+  fitTypeChipTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   // Size grid
   sizeGrid: {

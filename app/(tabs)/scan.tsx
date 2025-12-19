@@ -129,7 +129,7 @@ export default function ScanScreen() {
                   <View style={styles.sizesContainer}>
                     <Text style={styles.sizesLabel}>Sizes:</Text>
                     <Text style={styles.sizesText}>
-                      {product.sizes.join(', ')}
+                      {product.sizes.map(s => s.display).join(', ')}
                     </Text>
                   </View>
                 )}
@@ -149,6 +149,7 @@ export default function ScanScreen() {
                   image_url: product.image_url ?? '',
                   sizes: JSON.stringify(product.sizes),
                   colors: JSON.stringify(product.colors),
+                  fits: JSON.stringify(product.fits ?? []),
                 },
               });
             }}
