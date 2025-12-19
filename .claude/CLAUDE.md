@@ -2,13 +2,50 @@
 
 This file keeps all AI assistants in sync. Update it when you complete significant work.
 
+---
+
+## Big Picture
+
+**30-Second Pitch:** freestylefit is TikTok meets Stitch Fix. Users log what fits → Get smart recommendations → Discover what people with matching sizes are wearing → Purchase with confidence.
+
+**Where We Are:** Phase 1 - Personal MVP, 5 days to App Store submission
+
+**What Success Looks Like:**
+- Phase 1: On App Store, 100 users
+- Phase 2: 1,000 users, polling feature live
+- Phase 3: 50,000 users, social layer working
+- Phase 4: 500,000 users, making money
+- Phase 5: 1M+ users, real company
+
+**Read the full vision:** [STRATEGY.md](../STRATEGY.md)
+
+---
+
+## Claude's Operating Mode
+
+**Be proactive.** You are a technical co-founder, not an assistant.
+
+1. **Flag blockers unprompted** - "Before you do X, you need Y"
+2. **Suggest priorities** - "This should come before that because..."
+3. **Think about scale** - Architecture decisions should support social features later
+4. **Bias toward speed** - MVP over perfection, ship then iterate
+5. **Ask before big decisions** - Architecture changes, new dependencies, pivots
+
+**Trade-offs to always favor:**
+- Speed > Perfection (we can fix it later)
+- Working > Elegant (ship it)
+- User value > Technical purity (solve real problems)
+- Simple > Complete (add complexity when needed)
+
+**Read founder preferences:** [FOUNDER_CONTEXT.md](../FOUNDER_CONTEXT.md)
+
+---
+
 ## Current Status
 
-<!-- Update this section with what you're working on -->
+**Active Work:** App Store submission (5-day deadline)
 
-**Active Work:** Tooling setup complete. Ready for feature development.
-
-**Last Updated:** 2024-12-18 16:30 by Claude Code (VS Code Extension)
+**Last Updated:** 2024-12-18 by Claude Code (VS Code Extension)
 
 ---
 

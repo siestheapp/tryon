@@ -14,6 +14,14 @@
         "@modelcontextprotocol/server-filesystem",
         "/Users/seandavey/projects/tryon"
       ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless"
+      ]
     }
   }
 }

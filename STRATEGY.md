@@ -1,194 +1,251 @@
-# freestylefit - Product Strategy & AI Collaboration Guide
+# freestylefit - Complete Product Vision
 
-This document defines the vision, roadmap, and AI collaboration strategy for building freestylefit from MVP to millions of users.
-
----
-
-## Vision
-
-**The Problem:** Online shoppers waste time and money on clothes that don't fit. Every brand sizes differently. Returns are frustrating and expensive.
-
-**The Solution:** freestylefit learns how clothes fit YOUR body across brands. Paste a URL, log your try-on, and never guess your size again.
-
-**The Endgame:** A social platform where millions share fit data, creating the world's most accurate sizing intelligence. Think "Waze for clothing fit."
+> The definitive strategy document for building freestylefit from personal MVP to millions of users.
 
 ---
 
-## Current State (December 2024)
+## 1. The Vision
+
+**The Problem:** Online clothes shopping is guesswork. Every brand sizes differently. You order, hope it fits, and return half of it. It's frustrating, expensive, and anxiety-inducing.
+
+**The Solution:** freestylefit learns what fits YOUR body across brands. You log try-ons, get smart recommendations, and eventually discover what people with matching sizes are wearing.
+
+**The Endgame:** TikTok meets Stitch Fix. A social platform where millions share fit data, creating the world's most accurate sizing intelligence. Users scroll a For You Page of people who share their sizes, see what they're wearing, and buy with confidence.
+
+**The Magic Moment:** "Emma123 wears S in 3 items you also wear S in. She loves this Aritzia dress." → You know it will probably fit → Confident purchase.
+
+---
+
+## 2. Where We Are Now
+
+**Phase:** 1 - Personal MVP
+**Priority:** App Store submission in 5 days
+**Focus:** Pure personal utility (no social features yet)
 
 ### What Exists
-- iOS app (Expo/React Native) with dark UI
+- iOS app (Expo/React Native) with dark theme
 - 3-tab interface: Scan → History → Profile
 - Multi-step try-on wizard with body-part feedback
 - Supabase backend with 7 brands, 135 products, 575 variants
 - Python scrapers for J.Crew, Lululemon, Reiss, Theory, Uniqlo, rag & bone, Club Monaco
-- Auth flow (email verification)
+- Auth flow (email/password)
 - Production build ready for TestFlight
 
 ### Immediate Blockers
-1. TestFlight submission pending
-2. No app icon or screenshots
-3. No privacy policy URL
-4. GitHub token needs regeneration
-5. Database has 14 unindexed FKs (performance)
+1. Submit to TestFlight and test on device
+2. Create app icon (1024×1024)
+3. Generate App Store screenshots
+4. Write privacy policy URL
+5. Complete App Store metadata
 
 ---
 
-## Roadmap
+## 3. The Journey (5 Phases)
 
-### Phase 1: Launch MVP (Target: Jan 2025)
+### Phase 1: Launch MVP (NOW - Jan 2025)
 **Goal:** Get on App Store, acquire first 100 users
 
-| Task | Priority | AI Strategy |
-|------|----------|-------------|
-| Submit to TestFlight | P0 | Direct work |
-| Test on physical device | P0 | Direct work |
-| Create app icon (1024x1024) | P0 | Use `/feature-dev` or Cursor for design |
-| Generate screenshots | P0 | Direct work after testing |
-| Write privacy policy | P1 | Claude can draft, you review |
-| App Store metadata | P1 | Claude can draft copy |
-| Fix database indexes | P1 | Use Supabase MCP to generate migrations |
-| Submit for review | P0 | Direct work |
+| Task | Priority | Status |
+|------|----------|--------|
+| Submit to TestFlight | P0 | Pending |
+| Test on physical device | P0 | Pending |
+| App icon | P0 | Pending |
+| Screenshots | P0 | Pending |
+| Privacy policy | P1 | Pending |
+| App Store metadata | P1 | Pending |
+| Submit for review | P0 | Pending |
 
-### Phase 2: Core Loop (Target: Feb-Mar 2025)
-**Goal:** Validate product-market fit, reach 1,000 active users
+**V1 Positioning:** Personal fit tracker only. No hints about social features.
 
-| Feature | Description | AI Strategy |
-|---------|-------------|-------------|
-| Push notifications | Remind users to log try-ons | `/feature-dev` for architecture |
-| Size recommendations | "Based on your history, try M at J.Crew" | Complex - use Plan mode first |
-| More brands | Add 10+ brands to scrapers | Agents can help write scrapers |
-| Onboarding flow | Better first-run experience | `/feature-dev` |
-| Analytics | Track user behavior (Mixpanel/Amplitude) | Direct work with Claude assist |
-| Crash reporting | Sentry integration | Direct work |
+---
 
-### Phase 3: Social Layer (Target: Q2 2025)
+### Phase 2: Core Loop + Polling (Feb-Mar 2025)
+**Goal:** Validate product-market fit, reach 1,000 users
+
+| Feature | Description |
+|---------|-------------|
+| Size recommendations | "Based on your history, try M at J.Crew" |
+| **Polling feature** | Side-by-side "which looks better?" with crowd voting |
+| More brands | Scale scrapers from 7 → 50 brands |
+| User URL submission | Paste any product URL → auto-scrape into database |
+| Push notifications | Remind users to log try-ons |
+| Analytics | Track user behavior (Mixpanel/Amplitude) |
+
+**Why Polling Early:** Creates engagement before full social layer. Users get value from crowd feedback without needing follows/profiles.
+
+---
+
+### Phase 3: Social Layer (Q2 2025)
 **Goal:** Create network effects, reach 50,000 users
 
-| Feature | Description | AI Strategy |
-|---------|-------------|-------------|
-| User profiles | Public fit profiles | `/feature-dev` - multi-file feature |
-| Follow system | Follow users with similar body type | Plan mode → architecture decision |
-| Fit feed | "People like you rated this M" | Complex - design doc first |
-| Comments/tips | "Runs small in shoulders" | `/feature-dev` |
-| Share to social | Instagram/TikTok integration | Direct work |
-| Referral system | Invite friends, earn badges | `/feature-dev` |
+| Feature | Description |
+|---------|-------------|
+| User profiles | Public fit profiles showing size history |
+| FYP algorithm | Feed based on size matching (see Section 4) |
+| Follow system | Follow "fit twins" - people who match your sizes |
+| Content posting | Photos/videos with size + fit feedback |
+| Messaging | DM users with similar fits |
+| Share to social | Instagram/TikTok integration |
 
-### Phase 4: Intelligence (Target: Q3 2025)
-**Goal:** Become indispensable, reach 500,000 users
+---
 
-| Feature | Description | AI Strategy |
-|---------|-------------|-------------|
-| ML size prediction | Predict fit before buying | Research phase - Claude for architecture |
-| Brand comparison | "Your J.Crew M = Theory S" | Data analysis - agents can help |
-| Browser extension | One-click fit check while shopping | New codebase - `/feature-dev` |
-| Retailer API | Let brands integrate our data | Design doc first |
-| Photo try-on | AI virtual try-on (VTON) | Major R&D - phased approach |
+### Phase 4: Monetization (Q3 2025)
+**Goal:** Generate revenue, reach 500,000 users
 
-### Phase 5: Scale (Target: 2026)
-**Goal:** 1M+ users, revenue, potential acquisition
+| Revenue Stream | Description |
+|----------------|-------------|
+| Affiliate links | Commission on purchases through app |
+| Sponsored content | Brands pay to boost posts (still size-matched) |
+| Premium features | TBD - advanced analytics, fit predictions |
+
+---
+
+### Phase 5: Scale & Company (2026)
+**Goal:** 1M+ users, real company
 
 | Initiative | Description |
 |------------|-------------|
 | Android app | Expand platform |
-| Monetization | Premium features, affiliate revenue, B2B API |
 | International | EU sizing, more regions |
-| Partnerships | Integrate with Shopify stores |
-| Marketing | Influencer partnerships, content strategy |
+| First hires | Engineering, design, partnerships |
+| Fundraising | If needed for growth |
+| Partnerships | Shopify apps, brand integrations |
+| Potential exit | Acquisition by fashion retailer or tech platform |
 
 ---
 
-## AI Collaboration Framework
+## 4. The Social Algorithm (How FYP Works)
 
-### When to Use Each Tool
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    TASK COMPLEXITY GUIDE                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  SIMPLE                                                COMPLEX  │
-│    │                                                      │     │
-│    ▼                                                      ▼     │
-│                                                                 │
-│  Direct      Claude Code     Claude Code      Plan Mode +       │
-│  Work        Terminal        Extension        /feature-dev      │
-│                                                                 │
-│  • Typo      • Quick fixes   • Feature work   • New systems     │
-│  • Config    • Git ops       • Debugging      • Architecture    │
-│  • Manual    • Scripting     • Multi-file     • Social layer    │
-│    testing   • DB queries    • UI work        • ML features     │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Decision Tree: How Should I Build This?
+### Core Concept: Size Matching
+Users are matched based on shared sizing across products:
 
 ```
-Is it a bug fix or <10 lines of code?
-  YES → Just do it directly or ask Claude
-  NO  ↓
+Match Score = Count of products where both users rated "just_right" for same size
 
-Does it touch 1-2 files?
-  YES → Claude Code (terminal or extension)
-  NO  ↓
-
-Does it require architecture decisions?
-  YES → Use Plan Mode first (Shift+Tab twice)
-  NO  ↓
-
-Is it a new feature with multiple components?
-  YES → Use /feature-dev command
-  NO  ↓
-
-Is it research/exploration?
-  YES → Use Explore agent or ask Claude
-  NO  → Just start building, refactor later
+Example:
+- You: M in J.Crew Oxford, S in Lululemon Define Jacket, M in Theory Blazer
+- Emma123: M in J.Crew Oxford, S in Lululemon Define Jacket, L in Uniqlo Sweater
+- Match Score: 2 (J.Crew Oxford + Lululemon Define Jacket)
 ```
 
-### AI Tools by Use Case
+### Feed Priority
+1. **Fit twins content** - Posts from users with high match scores
+2. **Products likely to fit** - Based on your logged sizes
+3. **Sponsored (Phase 4)** - Brand-boosted but still size-matched
 
-| Task | Best Tool | Why |
-|------|-----------|-----|
-| Fix a bug | Claude Code Extension | Quick, contextual |
-| Write a new scraper | Claude Code Terminal | Can run/test immediately |
-| Design a feature | `/feature-dev` | Structured 7-phase process |
-| Review PR | `/code-review` | Parallel agents catch more |
-| Understand codebase | "Explore" agent | Fast, thorough search |
-| Database changes | Supabase MCP | Direct DB access + advisors |
-| Marketing copy | Cursor Chat | Creative writing |
-| Technical docs | Claude Code | Understands codebase |
-| Refactor code | `/review-pr simplify` | Code simplifier agent |
-| Plan complex work | Plan Mode | Research before building |
-
-### Parallel Work Strategies
-
-**Strategy 1: Git Worktrees**
-Work on multiple features simultaneously:
-```bash
-git worktree add ../freestylefit-social -b feature/social
-git worktree add ../freestylefit-notifications -b feature/push
-# Now you have 3 independent directories with separate Claude sessions
-```
-
-**Strategy 2: Agent Swarms**
-For large features, spawn multiple agents:
-```
-/feature-dev Add user following system
-# This spawns code-explorer, code-architect, code-reviewer agents in parallel
-```
-
-**Strategy 3: Background Research**
-While coding, have an agent research in background:
-```
-# In Claude Code:
-"Research how Instagram handles follow suggestions - run in background"
-# Continue working while it researches
-```
+### The Magic
+Instead of "people who viewed this also viewed that" (behavior-based), we use "people who FIT this also FIT that" (body-based). More accurate, more personal.
 
 ---
 
-## Key Metrics to Track
+## 5. Monetization Details
+
+### Affiliate Revenue
+- Every product link → affiliate URL → commission on purchase
+- Partner with major affiliate networks (Rakuten, CJ, etc.)
+- Track: clicks, conversions, revenue per user
+
+### Sponsored Content
+- Brands pay to boost posts in FYP
+- **Key constraint:** Still respects size matching (no showing clothes that won't fit)
+- Premium placement, not random ads
+
+### Premium Features (TBD)
+- Advanced fit analytics
+- Fit predictions before buying
+- Unlimited history
+- Early access to features
+
+---
+
+## 6. Database Strategy
+
+### Short-term: Scale Scrapers (7 → 50+ brands)
+- Current: J.Crew, Lululemon, Reiss, Theory, Uniqlo, rag & bone, Club Monaco
+- Priority additions: Aritzia, Banana Republic, Gap, Everlane, Reformation, Madewell
+- Python scrapers in `/scrapers/`
+
+### Medium-term: User URL Submission
+- Any user can paste a product URL
+- System auto-scrapes product into database
+- No waiting for manual scraper development
+- Architecture: Queue → Worker → Scrape → Insert
+
+### Long-term: Data Partnerships
+- Explore product feed partnerships with aggregators
+- More reliable than scraping
+- May require revenue share or licensing fees
+
+---
+
+## 7. Company Building
+
+### Pre-Product-Market-Fit (Now - 10K users)
+- Stay solo, move fast with AI tools
+- Use Claude, Cursor, etc. as co-founders
+- No employees, no fundraising
+- Focus: Ship features, learn from users
+
+### Early Traction (10K - 100K users)
+- Consider part-time help (design, brand outreach)
+- Contractors over employees
+- Still bootstrapped
+
+### Growth Phase (100K - 500K users)
+- First full-time hire (engineering or growth)
+- May need to formalize company structure
+- Consider fundraising if growth capital needed
+
+### Scale (500K+ users)
+- Multiple employees
+- Fundraise or bootstrap decision point
+- Possible acquisition interest
+
+---
+
+## 8. Competitive Landscape
+
+| Competitor | Model | Our Edge |
+|------------|-------|----------|
+| Stitch Fix | Personal styling, subscription | We're social, not algorithmic boxes |
+| True Fit | B2B size recommendations | We're consumer-facing, social proof |
+| Pinterest | Visual discovery | We add size intelligence |
+| TikTok | Social video | We add shopping integration + fit matching |
+| Instagram Shopping | Social commerce | We're fit-first, not just pretty photos |
+
+**freestylefit unique positioning:** Size matching + social discovery + direct purchase. The only platform where you buy from people who share your body type.
+
+---
+
+## 9. AI Collaboration Rules
+
+Claude (and other AI tools) should operate as a **proactive technical co-founder**:
+
+### Be Proactive
+- Flag blockers before asked ("Before you do X, you need Y")
+- Suggest priorities ("This should come before that because...")
+- Make recommendations on architecture with social features in mind
+
+### Bias Toward Speed
+- MVP over perfection
+- Ship then iterate
+- Simple over complete
+- Working over elegant
+
+### Ask Before Big Decisions
+- Architecture changes
+- New dependencies
+- Pivots from the roadmap
+- But don't wait to flag issues
+
+### Think About Scale
+- Database decisions should support millions of users
+- Every feature should consider "how does this work in social phase?"
+- Don't over-engineer, but don't paint into corners
+
+---
+
+## 10. Key Metrics
 
 ### Phase 1 (MVP)
 - App Store approval: Yes/No
@@ -199,133 +256,81 @@ While coding, have an agent research in background:
 ### Phase 2 (Core Loop)
 - 7-day retention: Target 30%
 - Try-ons per user: Target 5+
-- NPS: Target 40+
+- Polls created/voted: Track engagement
 - Brands requested: Track demand
 
 ### Phase 3 (Social)
 - Follows per user: Target 10+
+- FYP engagement: Scroll depth, clicks
 - Social shares: Target 100/week
-- Viral coefficient: Target 0.5+
 - User-generated content: Track volume
 
 ### Phase 4+ (Scale)
 - MAU: 100K → 500K → 1M
-- Revenue: TBD
-- API calls (B2B): TBD
+- Revenue per user
+- Affiliate conversion rate
+- Sponsored post CPM
 
 ---
 
-## Marketing & Growth Ideas
-
-### Pre-Launch
-- [ ] Landing page with waitlist
-- [ ] "Coming soon" social posts
-- [ ] Reddit soft launch (r/malefashionadvice, r/femalefashionadvice)
-
-### Launch
-- [ ] Product Hunt launch
-- [ ] Hacker News Show HN
-- [ ] Fashion blogger outreach
-- [ ] TikTok content (sizing fails → solution)
-
-### Growth Loops
-- **Content loop**: Users share fit data → Others discover app
-- **Utility loop**: More data → Better recommendations → More users
-- **Social loop**: Follow friends → See their fits → Log your own
-
-### Potential Partnerships
-- Shopify apps marketplace
-- Fashion influencers (affiliate deals)
-- Retail brands (white-label fit data)
-- Returns reduction platforms
-
----
-
-## Technical Debt & Improvements
+## 11. Technical Debt & Improvements
 
 ### Database (from Supabase Advisor)
 - [ ] Add indexes to 14 foreign keys
 - [ ] Remove duplicate indexes
 - [ ] Fix RLS `auth.uid()` → `(select auth.uid())`
 - [ ] Move pg_trgm to extensions schema
-- [ ] Enable leaked password protection
 
 ### App
-- [ ] Add error boundaries
-- [ ] Implement offline support
-- [ ] Add loading skeletons
-- [ ] Optimize image loading
-- [ ] Add haptic feedback
+- [ ] Error boundaries
+- [ ] Offline support
+- [ ] Loading skeletons
+- [ ] Image optimization
+- [ ] Haptic feedback
 
 ### Scrapers
-- [ ] Add retry logic
-- [ ] Implement rate limiting
-- [ ] Add monitoring/alerting
+- [ ] Retry logic
+- [ ] Rate limiting
+- [ ] Monitoring/alerting
 - [ ] Parallelize scraping
 
----
+### Known Scraping Blockers (Dec 2024)
+Sites that block headless browser / automated access:
 
-## Questions to Ask Claude
+| Site | Issue | Workaround |
+|------|-------|------------|
+| **Mr Porter** | Akamai bot protection, blocks all automated requests | Manual entry only |
+| **Patagonia** | Waiting room / queue system blocks automated access | Manual entry only |
+| **Lululemon** | HTTP/2 protocol errors with Playwright | WebFetch works |
 
-When starting any significant work, ask:
+**Working sites:**
+- Banana Republic (Playwright works)
+- Thursday Boots (Playwright works)
+- NN07 (Playwright works)
+- J.Crew, Theory, Uniqlo, Reiss, rag & bone (Python scrapers work)
 
-1. **"What's the best approach for [feature]?"**
-   - Claude will consider your codebase patterns
-   - May suggest using specific tools/agents
-
-2. **"Should I use /feature-dev for this?"**
-   - If multi-file or needs architecture decisions: Yes
-   - If simple fix: No, just do it
-
-3. **"What could go wrong with [approach]?"**
-   - Claude will identify risks
-   - May suggest alternatives
-
-4. **"How would [company] solve this?"**
-   - Learn from industry patterns
-   - "How does Stitch Fix do size recommendations?"
-
-5. **"What's the fastest path to validate [idea]?"**
-   - MVP thinking
-   - Avoid over-engineering
+**Data Validation:** Run `SELECT * FROM ops.validate_product_data() WHERE issue_count > 0;` after any ingestion to catch orphaned records, missing variants, etc.
 
 ---
 
-## Commands Quick Reference
+## 12. Quick Reference
 
+### Commands
 ```bash
-# Development
-/feature-dev [description]     # Guided feature development
-/code-review                   # Review current changes
-/commit                        # Smart commit
-/commit-push-pr               # Full PR workflow
-
-# Analysis
-/review-pr tests,errors        # Deep PR analysis
-/hookify [rule]               # Create behavior rules
-
-# Project Management
-/sync                         # Update CLAUDE.md with session work
-
-# Database (via Supabase MCP)
-"run the database advisor"     # Get performance/security issues
-"show me the schema"          # List tables
-"query [table]"               # Direct SQL
+/feature-dev [description]  # Guided feature development
+/code-review               # Review current changes
+/commit                    # Smart commit
+/plan [task]              # Get AI strategy advice
+/audit                    # Check for bloat
 ```
 
----
-
-## Success Criteria
-
-**You'll know freestylefit is working when:**
-
-1. **Users return** - 30%+ weekly retention
-2. **Users share** - Organic social posts
-3. **Users request features** - Sign of engagement
-4. **Brands notice** - Inbound partnership interest
-5. **Revenue potential clear** - B2B or premium path visible
+### Key Files
+- `STRATEGY.md` - This document (vision)
+- `.claude/CLAUDE.md` - Session context
+- `FOUNDER_CONTEXT.md` - Personal context for AI
+- `PROJECT_STATUS.md` - Current sprint status
+- `APPSTORE_ROADMAP.md` - Submission checklist
 
 ---
 
 *Last updated: 2024-12-18 by Claude Code (VS Code Extension)*
-*Run `/sync` to update CLAUDE.md when making progress on this roadmap*
