@@ -58,6 +58,7 @@ export default function ConfirmScreen() {
     sizes: string;
     colors: string;
     fits: string;
+    entry_point?: string; // 'scan' | 'closet'
   }>();
 
   const sizeOptions: SizeOption[] = params.sizes ? JSON.parse(params.sizes) : [];
@@ -78,6 +79,9 @@ export default function ConfirmScreen() {
   const [selectedFit, setSelectedFit] = useState<FitRating | null>(null); // User's fit rating (too_small, etc.)
   const [selectedBodyParts, setSelectedBodyParts] = useState<Set<BodyPartKey>>(new Set());
   const [notes, setNotes] = useState('');
+  const [ownsGarment, setOwnsGarment] = useState<boolean | null>(
+    params.entry_point === 'closet' ? true : null
+  );
   const [saving, setSaving] = useState(false);
 
   // Determine steps dynamically
@@ -92,6 +96,7 @@ export default function ConfirmScreen() {
     'size',
     'fit',
     ...(needsBodyParts ? ['body_parts'] : []),
+    'ownership',
   ];
   const totalSteps = steps.length;
 
@@ -122,6 +127,9 @@ export default function ConfirmScreen() {
     if (stepType === 'body_parts') {
       // Body parts is optional - can always proceed (even with none selected)
       return true;
+    }
+    if (stepType === 'ownership') {
+      return ownsGarment !== null;
     }
     return false;
   };
@@ -199,15 +207,17 @@ export default function ConfirmScreen() {
         waist_fit: getBodyPartValue('waist') as BodyPartFit | undefined,
         sleeve_fit: getBodyPartValue('sleeves') as LengthFit | undefined,
         length_fit: getBodyPartValue('length') as LengthFit | undefined,
+        // Ownership
+        owns_garment: ownsGarment ?? false,
       });
 
-      router.replace('/(tabs)/history');
+      router.replace('/(tabs)/closet');
     } catch (e) {
       console.error('Failed to save tryon:', e);
     } finally {
       setSaving(false);
     }
-  }, [selectedSize, selectedFit, selectedColor, isOtherColor, customColorName, notes, productId, router, selectedBodyParts]);
+  }, [selectedSize, selectedFit, selectedColor, isOtherColor, customColorName, notes, productId, router, selectedBodyParts, ownsGarment]);
 
   // Render functions for each step
   const renderColorStep = () => (
@@ -395,6 +405,48 @@ export default function ConfirmScreen() {
     </View>
   );
 
+  const renderOwnershipStep = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepQuestion}>Do you own this?</Text>
+      <View style={styles.ownershipGrid}>
+        <Pressable
+          style={[
+            styles.ownershipCard,
+            ownsGarment === true && styles.ownershipCardSelected,
+          ]}
+          onPress={() => setOwnsGarment(true)}
+        >
+          <Text style={styles.ownershipIcon}>👕</Text>
+          <Text
+            style={[
+              styles.ownershipLabel,
+              ownsGarment === true && styles.ownershipLabelSelected,
+            ]}
+          >
+            Yes, it's mine
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.ownershipCard,
+            ownsGarment === false && styles.ownershipCardSelected,
+          ]}
+          onPress={() => setOwnsGarment(false)}
+        >
+          <Text style={styles.ownershipIcon}>🛍️</Text>
+          <Text
+            style={[
+              styles.ownershipLabel,
+              ownsGarment === false && styles.ownershipLabelSelected,
+            ]}
+          >
+            No, just tried it
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+
   const renderStep = (stepType: string) => {
     switch (stepType) {
       case 'color':
@@ -407,6 +459,8 @@ export default function ConfirmScreen() {
         return renderFitStep();
       case 'body_parts':
         return renderBodyPartsStep();
+      case 'ownership':
+        return renderOwnershipStep();
       default:
         return null;
     }
@@ -774,6 +828,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bodyPartLabelSelected: {
+    color: colors.petrol500,
+    fontWeight: '600',
+  },
+  // Ownership grid
+  ownershipGrid: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.lg,
+  },
+  ownershipCard: {
+    width: 140,
+    alignItems: 'center',
+    paddingVertical: spacing['2xl'],
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: colors.border,
+  },
+  ownershipCardSelected: {
+    borderColor: colors.petrol500,
+    backgroundColor: 'rgba(0, 163, 163, 0.1)',
+  },
+  ownershipIcon: {
+    fontSize: 48,
+    marginBottom: spacing.md,
+  },
+  ownershipLabel: {
+    ...typography.bodyMedium,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  ownershipLabelSelected: {
     color: colors.petrol500,
     fontWeight: '600',
   },

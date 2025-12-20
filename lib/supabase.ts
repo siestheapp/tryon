@@ -54,6 +54,8 @@ export interface SaveTryonParams {
   waist_fit?: BodyPartFit;
   sleeve_fit?: LengthFit;
   length_fit?: LengthFit;
+  // Ownership
+  owns_garment?: boolean;
 }
 
 export interface SaveTryonResult {
@@ -72,8 +74,12 @@ export interface TryonHistoryItem {
   image_url: string | null;
   size_label: string;
   overall_fit: string;
+  owns_garment: boolean;
   created_at: string;
 }
+
+// Filter type for closet/history views
+export type TryonFilter = 'all' | 'owned' | 'tried';
 
 // Product lookup function
 export async function lookupProduct(url: string): Promise<ProductLookupResult | null> {
@@ -101,6 +107,8 @@ export async function saveTryon(params: SaveTryonParams): Promise<SaveTryonResul
     p_waist_fit: params.waist_fit ?? null,
     p_sleeve_fit: params.sleeve_fit ?? null,
     p_length_fit: params.length_fit ?? null,
+    // Ownership
+    p_owns_garment: params.owns_garment ?? false,
   });
 
   if (error) {
@@ -111,14 +119,16 @@ export async function saveTryon(params: SaveTryonParams): Promise<SaveTryonResul
   return data as SaveTryonResult;
 }
 
-// Get user's try-on history
+// Get user's try-on history with optional filter
 export async function getUserTryons(
   limit: number = 20,
-  offset: number = 0
+  offset: number = 0,
+  filter: TryonFilter = 'all'
 ): Promise<TryonHistoryItem[]> {
   const { data, error } = await supabase.rpc('get_user_tryons', {
     p_limit: limit,
     p_offset: offset,
+    p_filter: filter,
   });
   
   if (error) {

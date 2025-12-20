@@ -13,12 +13,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors, spacing, borderRadius, typography, components } from '../../theme/tokens';
 import { lookupProduct, ProductLookupResult } from '../../lib/supabase';
 
 export default function ScanScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ entry_point?: string }>();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -115,24 +116,6 @@ export default function ScanScreen() {
               <View style={styles.productInfo}>
                 <Text style={styles.productBrand}>{product.brand}</Text>
                 <Text style={styles.productTitle}>{product.title}</Text>
-                <Text style={styles.productCategory}>{product.category}</Text>
-                
-                {/* Colors */}
-                {product.colors.length > 0 && (
-                  <Text style={styles.productMeta}>
-                    {product.colors.length} color{product.colors.length !== 1 ? 's' : ''} available
-                  </Text>
-                )}
-                
-                {/* Sizes */}
-                {product.sizes.length > 0 && (
-                  <View style={styles.sizesContainer}>
-                    <Text style={styles.sizesLabel}>Sizes:</Text>
-                    <Text style={styles.sizesText}>
-                      {product.sizes.map(s => s.display).join(', ')}
-                    </Text>
-                  </View>
-                )}
               </View>
 
           {/* Continue Button */}
@@ -150,6 +133,7 @@ export default function ScanScreen() {
                   sizes: JSON.stringify(product.sizes),
                   colors: JSON.stringify(product.colors),
                   fits: JSON.stringify(product.fits ?? []),
+                  entry_point: params.entry_point ?? 'scan',
                 },
               });
             }}

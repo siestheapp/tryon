@@ -10,9 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { colors, spacing, borderRadius, typography, components } from '../../theme/tokens';
-import { getUserTryons, TryonHistoryItem } from '../../lib/supabase';
+import { getUserTryons, TryonHistoryItem, TryonFilter } from '../../lib/supabase';
 
 const FIT_DISPLAY: Record<string, { label: string; color: string }> = {
   too_small: { label: 'Too Small', color: colors.error },
@@ -20,11 +21,13 @@ const FIT_DISPLAY: Record<string, { label: string; color: string }> = {
   too_large: { label: 'Too Large', color: colors.warning },
 };
 
-export default function HistoryScreen() {
+export default function ClosetScreen() {
+  const router = useRouter();
   const [tryons, setTryons] = useState<TryonHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<TryonFilter>('owned');
 
   const fetchTryons = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) {
@@ -35,18 +38,18 @@ export default function HistoryScreen() {
     setError(null);
 
     try {
-      const data = await getUserTryons(50, 0);
+      const data = await getUserTryons(50, 0, filter);
       setTryons(data);
     } catch (e) {
       console.error('Failed to fetch tryons:', e);
-      setError('Failed to load try-ons');
+      setError('Failed to load items');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [filter]);
 
-  // Fetch on mount
+  // Fetch on mount and when filter changes
   useEffect(() => {
     fetchTryons();
   }, [fetchTryons]);
@@ -61,6 +64,13 @@ export default function HistoryScreen() {
   const handleRefresh = useCallback(() => {
     fetchTryons(true);
   }, [fetchTryons]);
+
+  const handleAddItem = () => {
+    router.push({
+      pathname: '/(tabs)/scan',
+      params: { entry_point: 'closet' },
+    });
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -110,24 +120,56 @@ export default function HistoryScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyStateEmoji}>👕</Text>
-      <Text style={styles.emptyStateTitle}>No try-ons yet</Text>
+      <Text style={styles.emptyStateEmoji}>{filter === 'owned' ? '👕' : '🛍️'}</Text>
+      <Text style={styles.emptyStateTitle}>
+        {filter === 'owned' ? 'Your closet is empty' : 'No try-ons yet'}
+      </Text>
       <Text style={styles.emptyStateText}>
-        Start by scanning a product on the Scan tab
+        {filter === 'owned'
+          ? 'Add items you own to get personalized recommendations'
+          : 'Start scanning products to track what fits'}
       </Text>
     </View>
   );
+
+  const getSubtitle = () => {
+    if (tryons.length === 0) {
+      return filter === 'owned'
+        ? 'Add your clothes to build your fit profile'
+        : 'Your try-on history will appear here';
+    }
+    const itemText = tryons.length === 1 ? 'item' : 'items';
+    return filter === 'owned'
+      ? `${tryons.length} ${itemText} in your closet`
+      : `${tryons.length} ${itemText} tried on`;
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Try-On History</Text>
-        <Text style={styles.subtitle}>
-          {tryons.length > 0
-            ? `${tryons.length} item${tryons.length !== 1 ? 's' : ''} logged`
-            : 'Your logged try-ons will appear here'}
-        </Text>
+        <Text style={styles.title}>My Closet</Text>
+        <Text style={styles.subtitle}>{getSubtitle()}</Text>
+      </View>
+
+      {/* Filter Toggle */}
+      <View style={styles.filterContainer}>
+        <Pressable
+          style={[styles.filterTab, filter === 'owned' && styles.filterTabActive]}
+          onPress={() => setFilter('owned')}
+        >
+          <Text style={[styles.filterTabText, filter === 'owned' && styles.filterTabTextActive]}>
+            My Closet
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.filterTab, filter === 'tried' && styles.filterTabActive]}
+          onPress={() => setFilter('tried')}
+        >
+          <Text style={[styles.filterTabText, filter === 'tried' && styles.filterTabTextActive]}>
+            Tried On
+          </Text>
+        </Pressable>
       </View>
 
       {/* Loading */}
@@ -166,6 +208,11 @@ export default function HistoryScreen() {
           }
         />
       )}
+
+      {/* FAB */}
+      <Pressable style={styles.fab} onPress={handleAddItem}>
+        <Ionicons name="add" size={28} color="#FFFFFF" />
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -178,7 +225,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: spacing['2xl'],
     paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.md,
   },
   title: {
     ...typography.h1,
@@ -187,6 +234,34 @@ const styles = StyleSheet.create({
   subtitle: {
     ...typography.body,
   },
+  // Filter toggle
+  filterContainer: {
+    flexDirection: 'row',
+    marginHorizontal: spacing['2xl'],
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.xs,
+  },
+  filterTab: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+  },
+  filterTabActive: {
+    backgroundColor: colors.petrol500,
+  },
+  filterTabText: {
+    ...typography.bodyMedium,
+    color: colors.textMuted,
+    fontSize: 14,
+  },
+  filterTabTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  // Loading & Error
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -210,9 +285,10 @@ const styles = StyleSheet.create({
   retryButtonText: {
     ...components.buttonSecondaryText,
   },
+  // List
   listContent: {
     paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing['3xl'],
+    paddingBottom: spacing['4xl'] * 2, // Extra padding for FAB
   },
   card: {
     ...components.card,
@@ -266,6 +342,7 @@ const styles = StyleSheet.create({
   cardDate: {
     ...typography.small,
   },
+  // Empty state
   emptyState: {
     flex: 1,
     justifyContent: 'center',
@@ -285,7 +362,21 @@ const styles = StyleSheet.create({
     ...typography.body,
     textAlign: 'center',
   },
+  // FAB
+  fab: {
+    position: 'absolute',
+    right: spacing['2xl'],
+    bottom: spacing['2xl'],
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.petrol500,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+  },
 });
-
-
-

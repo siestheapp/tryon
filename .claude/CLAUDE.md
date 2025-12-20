@@ -45,13 +45,24 @@ This file keeps all AI assistants in sync. Update it when you complete significa
 
 **Active Work:** App Store submission (5-day deadline)
 
-**Last Updated:** 2024-12-19 by Claude Code (Terminal)
+**Last Updated:** 2025-12-20 by Claude Code (Terminal)
 
 ---
 
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-20
+
+**[Claude Code - Terminal] - Session 5**
+- Built and submitted to TestFlight (build #6, v1.0.0)
+- Simplified product card UI - now shows only photo, brand, title, and CTA button (removed colors count, sizes list, category)
+- Renamed "History" tab to "Closet" (more intuitive naming)
+- Tested full try-on flow in simulator - working end-to-end
+- Verified data saves correctly: J.Crew oxford → size M → just_right → saved to closet ✓
+- Found URL matching issue: product URLs must match DB exactly (AY960 ≠ BE996)
+- **Files changed:** `app/(tabs)/scan.tsx`, `app/(tabs)/closet.tsx` (renamed from history.tsx), `app/(tabs)/_layout.tsx`, `app/confirm.tsx`, `lib/supabase.ts`
 
 ### 2024-12-19
 
