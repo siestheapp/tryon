@@ -14,7 +14,7 @@
       "blocked": "Cannot proceed - see notes"
     },
     "last_updated": "2025-12-21",
-    "updated_by": "Claude Code"
+    "updated_by": "Claude Code (Session 10)"
   },
 
   "phase_1_app_store": {
@@ -269,8 +269,9 @@
       {
         "id": "db-005",
         "name": "Phase 5: Banana Republic migration",
-        "status": "failing",
-        "notes": "Migrate 4 products from public.products to core.products"
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "Products already in core.products. Backfilled brand_product_id, added missing URLs, fixed resolve_product_by_url for query-param URLs (?pid=XXXX), updated product_lookup to use brand_product_id for color matching. Deprecated old db_utils.py scraper infrastructure."
       },
       {
         "id": "db-006",

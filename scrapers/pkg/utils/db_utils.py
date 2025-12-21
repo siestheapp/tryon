@@ -1,11 +1,32 @@
-"""Database utilities for scrapers."""
+"""Database utilities for scrapers.
 
+⚠️ DEPRECATED (2025-12-21): This module uses public.products which no longer exists.
+All product data now lives in core.products with a proper variant model.
+
+Use the modern ingest pattern instead:
+  - scrapers/jcrew_full_ingest.py (reference implementation)
+  - scrapers/clubmonaco_full_ingest.py
+  - scrapers/uniqlo_full_ingest.py
+
+To ingest Banana Republic products, create banana_republic_full_ingest.py
+following the J.Crew pattern. See .claude/plans/database-refactoring-plan.md.
+"""
+
+import warnings
 from typing import Optional, Dict, Any, List
 import json
 from datetime import datetime
 
 from config.database import db_config
 from models.product import ScrapedProduct, ScrapingRun
+
+# Emit deprecation warning on import
+warnings.warn(
+    "db_utils.py is deprecated. Use the *_full_ingest.py pattern instead. "
+    "See scrapers/jcrew_full_ingest.py for reference.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 class DatabaseManager:
     """Manages database operations for scrapers."""

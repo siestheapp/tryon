@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring (Phase 4 of 7 complete)
+**Active Work:** Database Schema Refactoring (Phase 5 of 7 complete)
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -107,7 +107,28 @@ Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
 
-**[Claude Code - Terminal] - Session 9: Scalable Product Consolidation**
+**[Claude Code - Terminal] - Session 10: Phase 5 - Banana Republic Migration**
+- **Goal:** Complete Phase 5 of database refactoring - Banana Republic migration
+- **Discovery:** Products already in `core.products` (4 products with proper variants). `public.products` table doesn't exist.
+- **Work completed:**
+  - Backfilled `brand_product_id` for all 4 Banana Republic products (6-digit codes: 710312, 796005, 795854, 800139)
+  - Added missing `product_urls` for products 261 and 267
+  - Fixed `resolve_product_by_url` - BR uses query params (`?pid=XXXX`) that were stripped by `canonicalize_url`. Added BR-specific matching that runs BEFORE canonical URL matching.
+  - Fixed `product_lookup` - color query was using 9-digit regex (Club Monaco format), now uses `brand_product_id` for finding related products
+  - Deprecated old `db_utils.py` with warning - uses `public.products` which no longer exists
+- **Migrations applied:**
+  - `backfill_brand_product_id_bananarepublic`
+  - `add_missing_bananarepublic_urls`
+  - `fix_bananarepublic_url_resolution` (v1)
+  - `fix_bananarepublic_url_resolution_v2` (check gap.com FIRST before canonical matching)
+  - `fix_product_lookup_use_brand_product_id`
+- **Verified:**
+  - All 4 BR products resolve correctly via URL
+  - Color counts match actual variant counts (Loafer: 1, Sweater: 17, Pant: 5, T-Shirt: 1)
+  - Club Monaco still works (Johnny Collar Polo: 5 colors)
+- **Phase 5 complete.** Next session: Phase 6 - Scraper Updates
+
+**[Claude Code - Terminal] - Session 9: Scalable Product Consolidation + Audit**
 - **Problem:** Title-based consolidation failed for near-matches ("Johnny Collar Polo" vs "Johnny Collar Polo Shirt")
 - **Solution:** Added `brand_product_id` column - extract brand's product identifier from product codes
   - Club Monaco: 9-digit numeric (e.g., `795806094` from `johnny-collar-polo-795806094-001`)
@@ -123,6 +144,11 @@ Record significant changes here so any AI can catch up quickly.
   - Uniqlo: No consolidation needed (all 32 products have unique brand_product_ids)
 - **Phase 3 & 4 complete**, debt-008 (near-match consolidation) resolved
 - **Architecture decision:** Use `brand_product_id` for consolidation, not `base_name` - scales to millions of products
+- **Audit cleanup:**
+  - Removed: `hooks.json`, placeholder hooks (pretooluse, posttooluse, userpromptsubmit)
+  - Removed: `code-simplifier` agent (redundant with code-reviewer)
+  - Removed: `fs-core` MCP server (not using Cursor Chat)
+  - Health score: 7/10 → 9/10
 - **Next session:** Phase 5 - Banana Republic Migration
 
 **[Claude Code - Terminal] - Session 8: Database Schema Refactor Phase 3**
