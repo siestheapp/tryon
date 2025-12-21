@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring (Phase 6 of 7 complete)
+**Active Work:** Database Schema Refactoring COMPLETE (7/7 phases done)
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -106,6 +106,20 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
+
+**[Claude Code - Terminal] - Session 12: Phase 7 - Complete Database Refactoring**
+- **Goal:** Add variant_id tracking to complete the database refactoring
+- **Context:** Reviewed the original problem - products showing 1 color instead of all colors. Verified the fix works (Johnny Collar Polo now returns 5 colors).
+- **Work completed:**
+  - Added `variant_id` column to `core.user_garments` with FK to `product_variants`
+  - Updated `save_tryon()` function to actually save the variant_id (was accepting but ignoring it)
+  - Updated `get_user_tryons()` to return `color_name` and prefer the specific variant's image
+  - Updated TypeScript interface `TryonHistoryItem` to include `color_name`
+- **Migrations applied:**
+  - `add_variant_id_to_user_garments`
+  - `save_tryon_include_variant_id`
+  - `get_user_tryons_include_color`
+- **Result:** All 7 phases of database refactoring are now complete. Ready for 100-product ingest.
 
 **[Claude Code - Terminal] - Session 11: Phase 6 - Scraper Updates**
 - **Goal:** Update Club Monaco and Uniqlo scrapers to use one-product-per-style pattern

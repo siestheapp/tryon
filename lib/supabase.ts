@@ -75,6 +75,7 @@ export interface TryonHistoryItem {
   size_label: string;
   overall_fit: string;
   owns_garment: boolean;
+  color_name: string | null;  // The color variant they tried
   created_at: string;
 }
 
