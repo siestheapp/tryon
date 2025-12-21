@@ -226,8 +226,9 @@
       {
         "id": "debt-008",
         "name": "Consolidate near-match product base_names",
-        "status": "failing",
-        "notes": "Found during Phase 3: 'Johnny Collar Polo' (product 220) vs 'Johnny Collar Polo Shirt' (product 152) are same product with slightly different base_names. Need fuzzy matching or manual review to consolidate these."
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "Fixed with brand_product_id approach. Consolidate by brand's product ID (e.g., 795806094) instead of title. Scalable for millions of products."
       }
     ]
   },
@@ -256,13 +257,14 @@
         "name": "Phase 3: Club Monaco product consolidation",
         "status": "passing",
         "verified_date": "2025-12-21",
-        "notes": "Consolidated 51 products into 32 canonical + 19 merged. Handled duplicate Blue variant. product_lookup now returns multiple colors."
+        "notes": "51 products → 28 canonical + 23 merged. Added brand_product_id column for scalable consolidation. Near-match titles now consolidated (Johnny Collar Polo/Shirt → single product with 5 colors)."
       },
       {
         "id": "db-004",
         "name": "Phase 4: Uniqlo product consolidation",
-        "status": "failing",
-        "notes": "Merge 32 products into correct structure"
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "Backfilled brand_product_id. No consolidation needed - all 32 products have unique brand_product_ids (no color variants in current data)."
       },
       {
         "id": "db-005",

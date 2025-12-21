@@ -16,6 +16,27 @@ Transform the fs-core database from its current inconsistent state into a clean,
 - **Size mapping**: Full dimensional (waist×length, neck×sleeve, letter sizes by category)
 - **Product model**: Consolidate products (merge color-per-product into single products with variants)
 - **Banana Republic**: Migrate to core schema now
+- **Consolidation key**: Use `brand_product_id` (brand's canonical product identifier) instead of `base_name` for consolidation. This handles title variations like "Johnny Collar Polo" vs "Johnny Collar Polo Shirt".
+
+## Scalable Consolidation Approach (Added 2025-12-21)
+
+**Problem**: Title-based consolidation fails for near-matches ("Johnny Collar Polo" vs "Johnny Collar Polo Shirt").
+
+**Solution**: Extract the brand's product identifier from product codes:
+
+| Brand | Pattern | Example |
+|-------|---------|---------|
+| Club Monaco | 9-digit numeric | `795806094` from `johnny-collar-polo-795806094-001` |
+| Uniqlo | `E` + 6 digits | `E461189` from `E461189-000` |
+| J.Crew | Already correct | Uses style codes properly |
+
+**Schema**:
+```sql
+ALTER TABLE core.products ADD COLUMN brand_product_id TEXT;
+CREATE INDEX idx_products_brand_product_id ON core.products(brand_id, brand_product_id);
+```
+
+**Consolidation**: Group by `(brand_id, brand_product_id)` instead of `base_name`.
 
 ---
 
