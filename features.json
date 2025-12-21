@@ -241,8 +241,9 @@
       {
         "id": "db-002",
         "name": "Phase 2: Product consolidation schema",
-        "status": "failing",
-        "notes": "Add is_canonical, canonical_product_id, merged_at columns + consolidate_products() function"
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "3 migrations: consolidation columns, audit log table, consolidate_products() function. Tested on Cotton Linen Twill Pant."
       },
       {
         "id": "db-003",
