@@ -104,6 +104,25 @@ def slugify(value: str) -> str:
     return cleaned.strip("-") or "ungrouped"
 
 
+def extract_brand_product_id(handle: str) -> Optional[str]:
+    """Extract the 9-digit brand product ID from a Club Monaco handle.
+
+    Club Monaco handles follow the pattern:
+        {slug}-{9-digit-id}-{3-digit-color-code}
+    Example:
+        johnny-collar-polo-795806094-138 → 795806094
+
+    Returns None if no 9-digit ID can be extracted.
+    """
+    # Match 9-digit number followed by optional 3-digit color suffix
+    match = re.search(r'-(\d{9})(?:-\d{3})?$', handle)
+    if match:
+        return match.group(1)
+    # Also try just finding the 9-digit number anywhere
+    match = re.search(r'(\d{9})', handle)
+    return match.group(1) if match else None
+
+
 def size_sort_key(label: str, idx: int) -> int:
     normalized = label.strip().upper().replace(" ", "")
     return SIZE_ORDER.get(normalized, 200 + idx * 5)
@@ -278,6 +297,102 @@ def ensure_brand(cur, slug: str, name: str) -> int:
     return cur.fetchone()[0]
 
 
+def find_or_create_canonical_product(
+    cur,
+    brand_id: int,
+    brand_product_id: str,
+    product_code: str,
+    title: str,
+    base_name: str,
+    category: str,
+    raw_payload: Dict[str, object],
+    gender: str,
+) -> int:
+    """Find an existing canonical product by brand_product_id, or create a new one.
+
+    This implements the one-product-per-style pattern. When ingesting a new color
+    variant, we first check if a canonical product with the same brand_product_id
+    exists. If so, we add variants to that product. If not, we create a new product.
+
+    Args:
+        cur: Database cursor
+        brand_id: Brand ID
+        brand_product_id: Brand's product identifier (e.g., 9-digit code for CM)
+        product_code: Full product code (handle) - used if no existing product
+        title: Product title
+        base_name: Base product name (stripped of color suffix)
+        category: Product category
+        raw_payload: Raw API response
+        gender: Gender targeting (male/female/unisex)
+
+    Returns:
+        Product ID (existing canonical or newly created)
+    """
+    if brand_product_id:
+        # Check if a canonical product exists with this brand_product_id
+        cur.execute(
+            """
+            SELECT id FROM core.products
+             WHERE brand_id = %s
+               AND brand_product_id = %s
+               AND (is_canonical = true OR is_canonical IS NULL)
+             LIMIT 1
+            """,
+            (brand_id, brand_product_id),
+        )
+        row = cur.fetchone()
+        if row:
+            # Found existing canonical product - we'll add variants to it
+            product_id = row[0]
+            # Update raw payload with latest data (keeps product info fresh)
+            cur.execute(
+                """
+                UPDATE core.products
+                   SET updated_at = now()
+                 WHERE id = %s
+                """,
+                (product_id,),
+            )
+            return product_id
+
+    # No existing canonical product - check if this exact product_code exists
+    cur.execute(
+        "SELECT id FROM core.products WHERE product_code = %s",
+        (product_code,),
+    )
+    row = cur.fetchone()
+    if row:
+        product_id = row[0]
+        # Update with brand_product_id if we have it
+        cur.execute(
+            """
+            UPDATE core.products
+               SET brand_id = %s,
+                   title = %s,
+                   base_name = %s,
+                   category = %s,
+                   raw = %s,
+                   gender = %s,
+                   brand_product_id = COALESCE(brand_product_id, %s),
+                   updated_at = now()
+             WHERE id = %s
+            """,
+            (brand_id, title, base_name, category, Json(raw_payload), gender, brand_product_id, product_id),
+        )
+        return product_id
+
+    # Create new product
+    cur.execute(
+        """
+        INSERT INTO core.products (brand_id, product_code, title, base_name, category, raw, gender, brand_product_id)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+        RETURNING id
+        """,
+        (brand_id, product_code, title, base_name, category, Json(raw_payload), gender, brand_product_id),
+    )
+    return cur.fetchone()[0]
+
+
 def ensure_product(
     cur,
     brand_id: int,
@@ -288,6 +403,7 @@ def ensure_product(
     raw_payload: Dict[str, object],
     gender: str,
 ) -> int:
+    """Legacy function - prefer find_or_create_canonical_product for new code."""
     cur.execute(
         "SELECT id FROM core.products WHERE product_code = %s",
         (product_code,),
@@ -513,11 +629,15 @@ def ingest_product(
     # Use handle as product_code (matches URL structure)
     product_code = handle
 
+    # Extract brand_product_id for consolidation
+    brand_product_id = extract_brand_product_id(handle)
+
     if dry_run:
         print(json.dumps({
             "handle": product.handle,
             "title": product.title,
             "base_name": product.base_name,
+            "brand_product_id": brand_product_id,
             "product_type": product.product_type,
             "variant_count": len(product.variants),
             "image_count": len(product.images),
@@ -538,9 +658,11 @@ def ingest_product(
                 if any("women" in t.lower() for t in product.tags):
                     gender = "female"
 
-                product_id = ensure_product(
+                # Use find_or_create_canonical_product for one-product-per-style pattern
+                product_id = find_or_create_canonical_product(
                     cur,
                     brand_id,
+                    brand_product_id,
                     product_code,
                     product.title,
                     product.base_name,
@@ -600,7 +722,7 @@ def ingest_product(
         if check_result.issues:
             print(f"⚠️  Ingest checker found issues: {'; '.join(check_result.issues)}")
 
-        print(f"✅ Ingested {product.title} ({len(product.variants)} variants)")
+        print(f"✅ Ingested {product.title} (brand_product_id={brand_product_id}, {len(product.variants)} variants)")
 
     except Exception as exc:
         mark_ingest_run_error(run_id, product_id, str(exc))

@@ -14,7 +14,7 @@
       "blocked": "Cannot proceed - see notes"
     },
     "last_updated": "2025-12-21",
-    "updated_by": "Claude Code (Session 10)"
+    "updated_by": "Claude Code (Session 11)"
   },
 
   "phase_1_app_store": {
@@ -276,8 +276,9 @@
       {
         "id": "db-006",
         "name": "Phase 6: Scraper updates",
-        "status": "failing",
-        "notes": "Fix Club Monaco and Uniqlo scrapers to create one-product-per-style"
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "Added find_or_create_canonical_product() to Club Monaco and Uniqlo scrapers. Both now use brand_product_id to consolidate color variants into single products."
       },
       {
         "id": "db-007",

@@ -104,6 +104,23 @@ def normalize_token(value: Optional[str]) -> Optional[str]:
     return token or None
 
 
+def extract_brand_product_id(product_id: str) -> Optional[str]:
+    """Extract the base product ID from a Uniqlo product_id.
+
+    Uniqlo product IDs follow the pattern:
+        E{6-digit-id}-{3-digit-color-code}
+    Example:
+        E461189-000 → E461189
+
+    Returns None if no valid ID can be extracted.
+    """
+    if not product_id:
+        return None
+    # Match E followed by 6 digits, optionally followed by color suffix
+    match = re.match(r'(E\d{6})(?:-\d{3})?', product_id)
+    return match.group(1) if match else None
+
+
 def infer_category(payload: Dict[str, Any]) -> str:
     breadcrumbs = payload.get("breadcrumbs") or {}
     candidates = [
@@ -134,15 +151,52 @@ def ensure_brand(cur, slug: str, name: str) -> int:
     return cur.fetchone()[0]
 
 
-def upsert_product(cur, brand_id: int, payload: Dict[str, Any]) -> int:
-    product_code = payload["product_id"]
-    title = payload["name"]
-    category = infer_category(payload)
-    gender = normalize_gender(payload)
+def find_or_create_canonical_product(
+    cur,
+    brand_id: int,
+    brand_product_id: Optional[str],
+    product_code: str,
+    title: str,
+    category: str,
+    raw_payload: Dict[str, Any],
+    gender: Optional[str],
+) -> int:
+    """Find an existing canonical product by brand_product_id, or create a new one.
+
+    This implements the one-product-per-style pattern. When ingesting a new color
+    variant, we first check if a canonical product with the same brand_product_id
+    exists. If so, we add variants to that product. If not, we create a new product.
+
+    Returns:
+        Product ID (existing canonical or newly created)
+    """
+    if brand_product_id:
+        # Check if a canonical product exists with this brand_product_id
+        cur.execute(
+            """
+            SELECT id FROM core.products
+             WHERE brand_id = %s
+               AND brand_product_id = %s
+               AND (is_canonical = true OR is_canonical IS NULL)
+             LIMIT 1
+            """,
+            (brand_id, brand_product_id),
+        )
+        row = cur.fetchone()
+        if row:
+            # Found existing canonical product - update timestamp and return
+            product_id = row[0]
+            cur.execute(
+                "UPDATE core.products SET updated_at = NOW() WHERE id = %s",
+                (product_id,),
+            )
+            return product_id
+
+    # No existing canonical - use upsert on (brand_id, product_code)
     cur.execute(
         """
-        INSERT INTO core.products (brand_id, product_code, title, category, raw, base_name, gender)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO core.products (brand_id, product_code, title, category, raw, base_name, gender, brand_product_id)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (brand_id, product_code)
         DO UPDATE SET
             title = EXCLUDED.title,
@@ -150,6 +204,7 @@ def upsert_product(cur, brand_id: int, payload: Dict[str, Any]) -> int:
             raw = EXCLUDED.raw,
             base_name = EXCLUDED.base_name,
             gender = EXCLUDED.gender,
+            brand_product_id = COALESCE(core.products.brand_product_id, EXCLUDED.brand_product_id),
             updated_at = NOW()
         RETURNING id
         """,
@@ -158,12 +213,33 @@ def upsert_product(cur, brand_id: int, payload: Dict[str, Any]) -> int:
             product_code,
             title,
             category,
-            Json(payload),
-            title,
+            Json(raw_payload),
+            title,  # base_name = title for Uniqlo
             gender,
+            brand_product_id,
         ),
     )
     return cur.fetchone()[0]
+
+
+def upsert_product(cur, brand_id: int, payload: Dict[str, Any]) -> int:
+    """Legacy function - now uses find_or_create_canonical_product internally."""
+    product_code = payload["product_id"]
+    title = payload["name"]
+    category = infer_category(payload)
+    gender = normalize_gender(payload)
+    brand_product_id = extract_brand_product_id(product_code)
+
+    return find_or_create_canonical_product(
+        cur,
+        brand_id,
+        brand_product_id,
+        product_code,
+        title,
+        category,
+        payload,
+        gender,
+    )
 
 
 def normalize_gender(payload: Dict[str, Any]) -> Optional[str]:
@@ -315,9 +391,12 @@ def upsert_product_url(cur, product_id: int, variant_id: int, payload: Dict[str,
 
 
 def summarize(payload: Dict[str, Any], category: str, variant_url: str) -> str:
+    product_id = payload.get('product_id', '')
+    brand_product_id = extract_brand_product_id(product_id)
     return "\n".join(
         [
-            f"Product: {payload.get('name')} ({payload.get('product_id')})",
+            f"Product: {payload.get('name')} ({product_id})",
+            f"Brand Product ID: {brand_product_id}",
             f"Category: {category} | Gender: {payload.get('gender')}",
             f"Colors: {len(payload.get('colors') or [])} | Sizes: {len(payload.get('sizes') or [])}",
             f"Variant URL: {variant_url}",

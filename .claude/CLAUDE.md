@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring (Phase 5 of 7 complete)
+**Active Work:** Database Schema Refactoring (Phase 6 of 7 complete)
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -106,6 +106,19 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
+
+**[Claude Code - Terminal] - Session 11: Phase 6 - Scraper Updates**
+- **Goal:** Update Club Monaco and Uniqlo scrapers to use one-product-per-style pattern
+- **Work completed:**
+  - Added `extract_brand_product_id()` to Club Monaco scraper (extracts 9-digit code from handles)
+  - Added `extract_brand_product_id()` to Uniqlo scraper (extracts E+6 digits from product_id)
+  - Added `find_or_create_canonical_product()` to both scrapers - checks if canonical product exists before creating new one
+  - Both scrapers now populate `brand_product_id` column on insert
+  - Updated dry-run output to show `brand_product_id` for verification
+- **Verified:**
+  - Club Monaco: Same brand_product_id (795806094) extracted from both `johnny-collar-polo-795806094-001` and `johnny-collar-polo-shirt-795806094-138`
+  - Uniqlo: All test cases pass for brand_product_id extraction
+- **Phase 6 complete.** Next session: Phase 7 - Update product_lookup function
 
 **[Claude Code - Terminal] - Session 10: Phase 5 - Banana Republic Migration**
 - **Goal:** Complete Phase 5 of database refactoring - Banana Republic migration
