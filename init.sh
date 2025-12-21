@@ -62,6 +62,9 @@ if command -v jq &> /dev/null; then
 
     echo "  Known Bugs:"
     jq -r '.known_bugs.features | group_by(.status) | map("    \(.[0].status): \(length)") | .[]' features.json 2>/dev/null || echo "    (parse error)"
+
+    echo "  Database Refactoring:"
+    jq -r '.database_refactoring.features | group_by(.status) | map("    \(.[0].status): \(length)") | .[]' features.json 2>/dev/null || echo "    (parse error)"
 else
     echo "  (install jq for detailed breakdown)"
     grep -c '"status": "failing"' features.json | xargs -I {} echo "  Failing: {}"
@@ -75,10 +78,18 @@ echo ""
 echo "🎯 Next Feature to Work On:"
 if command -v jq &> /dev/null; then
     # Get first failing feature from highest priority section
+    # Priority: active work (database_refactoring) -> P0 (app_store) -> P1 (known_bugs) -> P2 (tech_debt)
     NEXT=$(jq -r '
-        .phase_1_app_store.features[] | select(.status == "failing") |
+        .database_refactoring.features[] | select(.status == "failing") |
         "  [\(.id)] \(.name)"
     ' features.json 2>/dev/null | head -1)
+
+    if [ -z "$NEXT" ]; then
+        NEXT=$(jq -r '
+            .phase_1_app_store.features[] | select(.status == "failing") |
+            "  [\(.id)] \(.name)"
+        ' features.json 2>/dev/null | head -1)
+    fi
 
     if [ -z "$NEXT" ]; then
         NEXT=$(jq -r '
