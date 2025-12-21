@@ -1,0 +1,259 @@
+{
+  "_meta": {
+    "description": "Structured feature list for long-running agent sessions. Features marked 'failing' until verified working.",
+    "rules": [
+      "NEVER remove or edit a feature - only change status",
+      "NEVER mark 'passing' without end-to-end verification",
+      "Work on ONE feature per session",
+      "Commit after each feature completion"
+    ],
+    "statuses": {
+      "failing": "Not yet implemented or not verified",
+      "in_progress": "Currently being worked on",
+      "passing": "Implemented AND verified working",
+      "blocked": "Cannot proceed - see notes"
+    },
+    "last_updated": "2025-12-21",
+    "updated_by": "Claude Code"
+  },
+
+  "phase_1_app_store": {
+    "description": "Get on App Store - 5 day deadline",
+    "priority": "P0",
+    "features": [
+      {
+        "id": "p1-001",
+        "name": "TestFlight build submitted",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Build #6, v1.0.0 submitted"
+      },
+      {
+        "id": "p1-002",
+        "name": "Test on physical device via TestFlight",
+        "status": "failing",
+        "notes": "Awaiting TestFlight approval"
+      },
+      {
+        "id": "p1-003",
+        "name": "App icon (1024x1024)",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p1-004",
+        "name": "App Store screenshots (6.7\" and 5.5\")",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p1-005",
+        "name": "Privacy policy URL",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p1-006",
+        "name": "App Store metadata (description, keywords, category)",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p1-007",
+        "name": "Submit for App Store review",
+        "status": "failing",
+        "notes": "Blocked by p1-002 through p1-006"
+      }
+    ]
+  },
+
+  "phase_1_core_features": {
+    "description": "Core app functionality",
+    "priority": "P0",
+    "features": [
+      {
+        "id": "core-001",
+        "name": "Scan tab - paste URL and lookup product",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Verified in simulator"
+      },
+      {
+        "id": "core-002",
+        "name": "Confirm screen - color selection",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Working with 100px swatches"
+      },
+      {
+        "id": "core-003",
+        "name": "Confirm screen - fit type selection",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Added 2025-12-19"
+      },
+      {
+        "id": "core-004",
+        "name": "Confirm screen - size selection",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Shows human-readable sizes"
+      },
+      {
+        "id": "core-005",
+        "name": "Confirm screen - fit rating with body parts",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": ""
+      },
+      {
+        "id": "core-006",
+        "name": "Confirm screen - save try-on to database",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Verified J.Crew oxford saves correctly"
+      },
+      {
+        "id": "core-007",
+        "name": "Closet tab - view logged try-ons",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": "Renamed from History tab"
+      },
+      {
+        "id": "core-008",
+        "name": "Closet tab - pull to refresh",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": ""
+      },
+      {
+        "id": "core-009",
+        "name": "Profile tab - user stats",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": ""
+      },
+      {
+        "id": "core-010",
+        "name": "Profile tab - sign out",
+        "status": "passing",
+        "verified_date": "2025-12-20",
+        "notes": ""
+      },
+      {
+        "id": "core-011",
+        "name": "Auth - sign in flow",
+        "status": "passing",
+        "verified_date": "2025-12-17",
+        "notes": ""
+      },
+      {
+        "id": "core-012",
+        "name": "Auth - sign up flow",
+        "status": "passing",
+        "verified_date": "2025-12-17",
+        "notes": ""
+      }
+    ]
+  },
+
+  "known_bugs": {
+    "description": "Known issues to fix",
+    "priority": "P1",
+    "features": [
+      {
+        "id": "bug-001",
+        "name": "URL matching requires exact match (AY960 != BE996)",
+        "status": "failing",
+        "notes": "Product URLs must match DB exactly - may need fuzzy matching"
+      },
+      {
+        "id": "bug-002",
+        "name": "48 products missing images (Uniqlo, rag & bone, Banana Republic)",
+        "status": "failing",
+        "notes": "Need to re-run scrapers with image extraction"
+      }
+    ]
+  },
+
+  "tech_debt": {
+    "description": "Technical debt from Supabase advisor",
+    "priority": "P2",
+    "features": [
+      {
+        "id": "debt-001",
+        "name": "Add indexes to 14 foreign keys",
+        "status": "failing",
+        "notes": "See Supabase advisor output"
+      },
+      {
+        "id": "debt-002",
+        "name": "Remove duplicate indexes",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "debt-003",
+        "name": "Fix RLS auth.uid() -> (select auth.uid())",
+        "status": "failing",
+        "notes": "Performance optimization"
+      },
+      {
+        "id": "debt-004",
+        "name": "Move pg_trgm to extensions schema",
+        "status": "failing",
+        "notes": "Security best practice"
+      },
+      {
+        "id": "debt-005",
+        "name": "Fix Banana Republic scraper schema (public -> core)",
+        "status": "failing",
+        "notes": ""
+      }
+    ]
+  },
+
+  "phase_2_features": {
+    "description": "Post-launch features for Phase 2",
+    "priority": "P3",
+    "features": [
+      {
+        "id": "p2-001",
+        "name": "Size recommendations based on history",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p2-002",
+        "name": "Polling feature - side-by-side voting",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p2-003",
+        "name": "User URL submission with auto-scrape",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p2-004",
+        "name": "Push notifications",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p2-005",
+        "name": "Analytics integration (Mixpanel/Amplitude)",
+        "status": "failing",
+        "notes": ""
+      },
+      {
+        "id": "p2-006",
+        "name": "Scale scrapers from 7 to 50 brands",
+        "status": "failing",
+        "notes": ""
+      }
+    ]
+  }
+}

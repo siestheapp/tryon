@@ -41,6 +41,58 @@ This file keeps all AI assistants in sync. Update it when you complete significa
 
 ---
 
+## Long-Running Agent Harness
+
+This project uses the harness pattern from [Anthropic's guide](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents).
+
+### Session Startup Protocol
+
+**EVERY session must start by running:**
+```bash
+./init.sh
+```
+
+This script:
+1. Verifies working directory
+2. Shows git status and recent commits
+3. Reads current progress from this file
+4. Summarizes feature status from `features.json`
+5. Identifies the next failing feature to work on
+
+### Session Rules (MANDATORY)
+
+1. **ONE feature per session** - Complete one thing, commit, end session
+2. **NEVER mark "passing" without testing** - Run the app, verify it works
+3. **NEVER remove features from features.json** - Only change status
+4. **Commit after each feature** - Enables rollback if next session breaks things
+5. **Update features.json** - Mark status changes immediately
+6. **Run /sync before ending** - Updates this file for next session
+
+### Testing Requirements
+
+**A feature is NOT complete until:**
+- [ ] Code is written
+- [ ] App runs without errors (`npx expo start`)
+- [ ] Feature is manually tested in simulator or device
+- [ ] Edge cases considered (empty states, errors, etc.)
+- [ ] features.json status updated to "passing" with verified_date
+
+**Do NOT:**
+- Mark features passing based on "the code looks right"
+- Skip testing because "it's a small change"
+- Batch multiple features before testing
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `features.json` | Structured task list with pass/fail status |
+| `init.sh` | Session startup script |
+| `.claude/CLAUDE.md` | This file - session continuity |
+| `STRATEGY.md` | Product vision and roadmap |
+
+---
+
 ## Current Status
 
 **Active Work:** App Store submission (5-day deadline)
