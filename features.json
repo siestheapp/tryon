@@ -222,6 +222,12 @@
         "name": "Build brand_colors library for all brands",
         "status": "failing",
         "notes": "Scalable swatch fallback: swatch_url -> hex_code -> first letter"
+      },
+      {
+        "id": "debt-008",
+        "name": "Consolidate near-match product base_names",
+        "status": "failing",
+        "notes": "Found during Phase 3: 'Johnny Collar Polo' (product 220) vs 'Johnny Collar Polo Shirt' (product 152) are same product with slightly different base_names. Need fuzzy matching or manual review to consolidate these."
       }
     ]
   },
@@ -248,8 +254,9 @@
       {
         "id": "db-003",
         "name": "Phase 3: Club Monaco product consolidation",
-        "status": "failing",
-        "notes": "Merge 51 products into ~25 canonical products with variants"
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "Consolidated 51 products into 32 canonical + 19 merged. Handled duplicate Blue variant. product_lookup now returns multiple colors."
       },
       {
         "id": "db-004",
