@@ -226,6 +226,57 @@
     ]
   },
 
+  "database_refactoring": {
+    "description": "Database schema refactoring for scalability - 7 phases",
+    "priority": "P1",
+    "plan_file": "~/.claude/plans/jiggly-conjuring-locket.md",
+    "features": [
+      {
+        "id": "db-001",
+        "name": "Phase 1: Size normalization schema",
+        "status": "passing",
+        "verified_date": "2025-12-21",
+        "notes": "12 migrations: size_categories, canonical_sizes, brand_size_mappings, normalize_size_label()"
+      },
+      {
+        "id": "db-002",
+        "name": "Phase 2: Product consolidation schema",
+        "status": "failing",
+        "notes": "Add is_canonical, canonical_product_id, merged_at columns + consolidate_products() function"
+      },
+      {
+        "id": "db-003",
+        "name": "Phase 3: Club Monaco product consolidation",
+        "status": "failing",
+        "notes": "Merge 51 products into ~25 canonical products with variants"
+      },
+      {
+        "id": "db-004",
+        "name": "Phase 4: Uniqlo product consolidation",
+        "status": "failing",
+        "notes": "Merge 32 products into correct structure"
+      },
+      {
+        "id": "db-005",
+        "name": "Phase 5: Banana Republic migration",
+        "status": "failing",
+        "notes": "Migrate 4 products from public.products to core.products"
+      },
+      {
+        "id": "db-006",
+        "name": "Phase 6: Scraper updates",
+        "status": "failing",
+        "notes": "Fix Club Monaco and Uniqlo scrapers to create one-product-per-style"
+      },
+      {
+        "id": "db-007",
+        "name": "Phase 7: Update product_lookup function",
+        "status": "failing",
+        "notes": "Filter to canonical products, add variant_id to user_garments"
+      }
+    ]
+  },
+
   "phase_2_features": {
     "description": "Post-launch features for Phase 2",
     "priority": "P3",
