@@ -229,7 +229,7 @@
   "database_refactoring": {
     "description": "Database schema refactoring for scalability - 7 phases",
     "priority": "P1",
-    "plan_file": "~/.claude/plans/jiggly-conjuring-locket.md",
+    "plan_file": ".claude/plans/database-refactoring-plan.md",
     "features": [
       {
         "id": "db-001",
