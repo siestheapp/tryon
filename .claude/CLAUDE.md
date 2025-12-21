@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring (Phase 2 of 7 complete)
+**Active Work:** Database Schema Refactoring (Phase 3 of 7 complete)
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -106,6 +106,18 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
+
+**[Claude Code - Terminal] - Session 8: Database Schema Refactor Phase 3**
+- **Goal:** Consolidate Club Monaco products (merge color-per-product into single products with variants)
+- **Phase 3 Complete - Club Monaco Consolidation:**
+  - Consolidated 51 products → 32 canonical + 19 merged
+  - Handled duplicate "Blue" variant on Johnny Collar Polo (products 219 & 231 were identical)
+  - Migration: `consolidate_clubmonaco_products`
+- **Verified:**
+  - `product_lookup` now returns multiple colors (Johnny Collar Polo: 4 colors)
+  - All user_garments still reference canonical products
+- **Issue found:** Near-match base_names not consolidated (e.g., "Johnny Collar Polo" vs "Johnny Collar Polo Shirt") - added to tech debt
+- **Next session:** Phase 4 - Uniqlo Product Consolidation
 
 **[Claude Code - Terminal] - Session 7: Database Schema Refactor Phase 2**
 - **Goal:** Build product consolidation infrastructure
@@ -215,6 +227,7 @@ Record significant changes here so any AI can catch up quickly.
 6. **Scrapers:** Banana Republic scraper uses wrong schema (`public.products` instead of `core`) - needs architectural fix
 7. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
 8. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
+9. **Data quality:** Near-match product base_names need consolidation (e.g., "Johnny Collar Polo" vs "Johnny Collar Polo Shirt")
 
 ---
 
