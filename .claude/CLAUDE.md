@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring (Phase 3 of 7 complete)
+**Active Work:** Database Schema Refactoring (Phase 4 of 7 complete)
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -106,6 +106,24 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
+
+**[Claude Code - Terminal] - Session 9: Scalable Product Consolidation**
+- **Problem:** Title-based consolidation failed for near-matches ("Johnny Collar Polo" vs "Johnny Collar Polo Shirt")
+- **Solution:** Added `brand_product_id` column - extract brand's product identifier from product codes
+  - Club Monaco: 9-digit numeric (e.g., `795806094` from `johnny-collar-polo-795806094-001`)
+  - Uniqlo: E + 6 digits (e.g., `E461189` from `E461189-000`)
+- **Migrations applied:**
+  - `add_brand_product_id_column`
+  - `backfill_brand_product_id_clubmonaco`
+  - `backfill_brand_product_id_uniqlo`
+  - `consolidate_by_brand_product_id`
+- **Results:**
+  - Club Monaco: 51 → 28 canonical + 23 merged (improved from 32 canonical)
+  - Johnny Collar Polo now returns 5 colors (was split across 2 products)
+  - Uniqlo: No consolidation needed (all 32 products have unique brand_product_ids)
+- **Phase 3 & 4 complete**, debt-008 (near-match consolidation) resolved
+- **Architecture decision:** Use `brand_product_id` for consolidation, not `base_name` - scales to millions of products
+- **Next session:** Phase 5 - Banana Republic Migration
 
 **[Claude Code - Terminal] - Session 8: Database Schema Refactor Phase 3**
 - **Goal:** Consolidate Club Monaco products (merge color-per-product into single products with variants)
@@ -212,6 +230,7 @@ Record significant changes here so any AI can catch up quickly.
 - **Database:** Supabase PostgreSQL with schemas: `core`, `content`, `ops`, `public`
 - **App:** Expo/React Native (tryon app)
 - **Scrapers:** Python scripts for product ingestion
+- **Product consolidation:** Use `brand_product_id` (brand's canonical identifier) instead of `base_name`. Scales to millions of products across thousands of brands with varying naming conventions.
 
 ---
 
@@ -227,7 +246,6 @@ Record significant changes here so any AI can catch up quickly.
 6. **Scrapers:** Banana Republic scraper uses wrong schema (`public.products` instead of `core`) - needs architectural fix
 7. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
 8. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
-9. **Data quality:** Near-match product base_names need consolidation (e.g., "Johnny Collar Polo" vs "Johnny Collar Polo Shirt")
 
 ---
 
