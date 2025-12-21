@@ -269,7 +269,7 @@ Record significant changes here so any AI can catch up quickly.
 3. **Database:** RLS policies need `(select auth.uid())` optimization
 4. **Security:** GitHub token exposed - needs regeneration (GitHub MCP removed for now)
 5. **Security:** `pg_trgm` extension in public schema - move to extensions
-6. **Scrapers:** Banana Republic scraper uses wrong schema (`public.products` instead of `core`) - needs architectural fix
+6. **Scrapers:** Banana Republic needs a proper ingest script (`banana_republic_full_ingest.py`) - old `db_utils.py` deprecated, products already in `core.products`
 7. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
 8. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
 
