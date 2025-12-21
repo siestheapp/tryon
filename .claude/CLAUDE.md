@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring (Phase 1 of 7 complete)
+**Active Work:** Database Schema Refactoring (Phase 2 of 7 complete)
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -106,6 +106,19 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
+
+**[Claude Code - Terminal] - Session 7: Database Schema Refactor Phase 2**
+- **Goal:** Build product consolidation infrastructure
+- **Phase 2 Complete - Product Consolidation Schema:**
+  - Added columns to `core.products`: `is_canonical`, `canonical_product_id`, `merged_at`
+  - Created `core.product_consolidation_log` audit table for rollback capability
+  - Created `core.consolidate_products(source_id, target_id, reason)` function
+  - Function moves variants, URLs, and user_garments from source to target
+- **Tested:** Consolidated Cotton Linen Twill Pant (product 217 → 216)
+- **3 migrations applied** for Phase 2
+- Fixed `init.sh` to prioritize database_refactoring in "Next Feature" recommendations
+- **Plan file moved:** `~/.claude/plans/` → `.claude/plans/database-refactoring-plan.md` (now tracked in git)
+- **Next session:** Phase 3 - Club Monaco Product Consolidation
 
 **[Claude Code - Terminal] - Session 6: Database Schema Refactor Phase 1**
 - **Goal:** Build size normalization system for cross-brand size recommendations
@@ -122,7 +135,7 @@ Record significant changes here so any AI can catch up quickly.
   - Banana Republic: 47.1% → 100%
   - 6 brands at 100% (Theory, Uniqlo, rag & bone, Thursday Boot, NN07)
 - **12 migrations applied** for Phase 1
-- **Plan file:** `.claude/plans/jiggly-conjuring-locket.md`
+- **Plan file:** `.claude/plans/database-refactoring-plan.md`
 - **Next session:** Phase 2 - Product Consolidation Schema
 
 ### 2025-12-20
