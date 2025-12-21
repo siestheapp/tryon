@@ -95,15 +95,35 @@ This script:
 
 ## Current Status
 
-**Active Work:** App Store submission (5-day deadline)
+**Active Work:** Database Schema Refactoring (Phase 1 of 7 complete)
 
-**Last Updated:** 2025-12-20 by Claude Code (Terminal)
+**Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
 ---
 
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-21
+
+**[Claude Code - Terminal] - Session 6: Database Schema Refactor Phase 1**
+- **Goal:** Build size normalization system for cross-brand size recommendations
+- Created comprehensive refactoring plan (7 phases, 25-34 hours total)
+- **Phase 1 Complete - Size Normalization:**
+  - Created `core.size_categories` table (6 categories: tops, pants, dress_shirts, shoes, shorts, suits)
+  - Created `core.canonical_sizes` table (205 normalized sizes)
+  - Created `core.brand_size_mappings` table (brand-specific → canonical mapping)
+  - Added `canonical_size_id` FK to `core.variant_sizes`
+  - Created `core.normalize_size_label()` function with auto-caching
+- **Match rates achieved:**
+  - Lululemon: 17.9% → 88.2%
+  - Club Monaco: 42.8% → 93.3%
+  - Banana Republic: 47.1% → 100%
+  - 6 brands at 100% (Theory, Uniqlo, rag & bone, Thursday Boot, NN07)
+- **12 migrations applied** for Phase 1
+- **Plan file:** `.claude/plans/jiggly-conjuring-locket.md`
+- **Next session:** Phase 2 - Product Consolidation Schema
 
 ### 2025-12-20
 

@@ -210,6 +210,18 @@
         "name": "Fix Banana Republic scraper schema (public -> core)",
         "status": "failing",
         "notes": ""
+      },
+      {
+        "id": "debt-006",
+        "name": "Re-scrape Club Monaco with color extraction",
+        "status": "failing",
+        "notes": "Extract hex from CSS filter-{color} classes via Playwright getComputedStyle"
+      },
+      {
+        "id": "debt-007",
+        "name": "Build brand_colors library for all brands",
+        "status": "failing",
+        "notes": "Scalable swatch fallback: swatch_url -> hex_code -> first letter"
       }
     ]
   },

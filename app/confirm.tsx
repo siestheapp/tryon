@@ -45,6 +45,7 @@ interface ColorOption {
   variant_id: number;
   color_name: string;
   swatch_url: string | null;
+  hex_code: string | null;
 }
 
 export default function ConfirmScreen() {
@@ -239,6 +240,8 @@ export default function ConfirmScreen() {
                 style={styles.colorSwatchImage}
                 contentFit="cover"
               />
+            ) : color.hex_code ? (
+              <View style={[styles.colorSwatchHex, { backgroundColor: color.hex_code }]} />
             ) : (
               <View style={styles.colorSwatchFallback}>
                 <Text style={styles.colorSwatchFallbackText}>
@@ -657,6 +660,11 @@ const styles = StyleSheet.create({
   colorSwatchImage: {
     width: '100%',
     height: '100%',
+  },
+  colorSwatchHex: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
   },
   colorSwatchFallback: {
     width: '100%',

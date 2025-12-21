@@ -31,7 +31,7 @@ export interface ProductLookupResult {
   category: string;
   image_url: string | null;
   sizes: SizeOption[];
-  colors: Array<{ variant_id: number; color_name: string; swatch_url: string | null }>;
+  colors: Array<{ variant_id: number; color_name: string; swatch_url: string | null; hex_code: string | null }>;
   fits: string[];  // e.g., ["Classic", "Slim", "Tall"]
 }
 
@@ -83,13 +83,15 @@ export type TryonFilter = 'all' | 'owned' | 'tried';
 
 // Product lookup function
 export async function lookupProduct(url: string): Promise<ProductLookupResult | null> {
+  console.log('[lookupProduct] Calling with URL:', url);
   const { data, error } = await supabase.rpc('product_lookup', { input_url: url });
-  
+
   if (error) {
     console.error('Product lookup error:', error);
     throw error;
   }
-  
+
+  console.log('[lookupProduct] Response colors:', JSON.stringify(data?.colors, null, 2));
   return data as ProductLookupResult | null;
 }
 
