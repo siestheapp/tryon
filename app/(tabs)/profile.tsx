@@ -2,11 +2,14 @@ import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, typography, components } from '../../theme/tokens';
 import { useAuth } from '../../lib/auth';
 import { getUserTryons, TryonHistoryItem } from '../../lib/supabase';
 import FitSnapshotCard from '../../components/FitSnapshotCard';
 import { FitOutcome } from '../../components/FitCard';
+
+const ONBOARDING_KEY = '@tryon/onboarded';
 
 // Safe mapping with fallback for invalid database values
 const mapFitOutcome = (fit: string): FitOutcome => {
@@ -107,6 +110,12 @@ export default function ProfileScreen() {
     router.push('/(tabs)/scan');
   };
 
+  // DEV ONLY: Reset onboarding for testing
+  const handleResetOnboarding = async () => {
+    await AsyncStorage.removeItem(ONBOARDING_KEY);
+    Alert.alert('Onboarding Reset', 'Reload the app to see onboarding again.');
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
@@ -168,6 +177,16 @@ export default function ProfileScreen() {
             <Text style={styles.menuItemValue}>1.0.0</Text>
           </View>
         </View>
+
+        {/* Dev Tools - Remove before production */}
+        {__DEV__ && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Dev Tools</Text>
+            <Pressable style={styles.menuItem} onPress={handleResetOnboarding}>
+              <Text style={styles.menuItemText}>Reset Onboarding</Text>
+            </Pressable>
+          </View>
+        )}
 
         <View style={{ height: spacing['4xl'] }} />
       </ScrollView>

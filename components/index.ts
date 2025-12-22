@@ -2,7 +2,7 @@
 // These components support the fit logging flow and Fit Passport surface
 
 export { default as FitCard } from './FitCard';
-export type { FitCardProps, FitOutcome, BodyPart, WhyReason } from './FitCard';
+export type { FitCardProps, FitOutcome, BodyPart } from './FitCard';
 
 export { default as PredictiveSizeChip } from './PredictiveSizeChip';
 export type { PredictiveSizeChipProps, Confidence } from './PredictiveSizeChip';
@@ -12,4 +12,7 @@ export type { FitSnapshotProps, FitSnapshotBrand } from './FitSnapshotCard';
 
 export { default as BodyPartChip } from './BodyPartChip';
 export type { BodyPartChipProps } from './BodyPartChip';
+
+export { default as OnboardingScreen } from './OnboardingScreen';
+export type { OnboardingScreenProps } from './OnboardingScreen';
 
