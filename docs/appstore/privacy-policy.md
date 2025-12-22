@@ -36,6 +36,6 @@ We may update this policy from time to time. If we make material changes, we wil
 
 ### Contact
 For privacy questions or deletion requests, contact:
-`support@freestylefit.net` (replace with your real support email before publishing)
+`support@freestylefit.net`
 
 
