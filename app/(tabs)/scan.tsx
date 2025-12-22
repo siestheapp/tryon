@@ -70,18 +70,33 @@ export default function ScanScreen() {
 
           {/* URL Input */}
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={url}
-              onChangeText={setUrl}
-              placeholder="https://brand.com/product..."
-              placeholderTextColor={colors.textMuted}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="url"
-              returnKeyType="go"
-              onSubmitEditing={handleLookup}
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                value={url}
+                onChangeText={setUrl}
+                placeholder="https://brand.com/product..."
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="url"
+                returnKeyType="go"
+                onSubmitEditing={handleLookup}
+              />
+              {url.length > 0 && (
+                <Pressable
+                  style={styles.clearButton}
+                  onPress={() => {
+                    setUrl('');
+                    setProduct(null);
+                    setError(null);
+                  }}
+                  hitSlop={8}
+                >
+                  <Text style={styles.clearButtonText}>✕</Text>
+                </Pressable>
+              )}
+            </View>
             <Pressable
               style={[styles.button, !url.trim() && styles.buttonDisabled]}
               onPress={handleLookup}
@@ -126,6 +141,7 @@ export default function ScanScreen() {
                 pathname: '/confirm',
                 params: {
                   product_id: product.product_id.toString(),
+                  selected_variant_id: product.selected_variant_id?.toString() ?? '',
                   brand: product.brand,
                   title: product.title,
                   category: product.category,
@@ -188,8 +204,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['2xl'],
     gap: spacing.md,
   },
+  inputWrapper: {
+    position: 'relative',
+  },
   input: {
     ...components.input,
+    paddingRight: 44,
+  },
+  clearButton: {
+    position: 'absolute',
+    right: 12,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 32,
+  },
+  clearButtonText: {
+    color: colors.textMuted,
+    fontSize: 18,
+    fontWeight: '500',
   },
   button: {
     ...components.buttonPrimary,

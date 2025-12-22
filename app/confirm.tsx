@@ -52,6 +52,7 @@ export default function ConfirmScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
     product_id: string;
+    selected_variant_id?: string;
     brand: string;
     title: string;
     category: string;
@@ -66,13 +67,19 @@ export default function ConfirmScreen() {
   const colorOptions: ColorOption[] = params.colors ? JSON.parse(params.colors) : [];
   const fitOptions: string[] = params.fits ? JSON.parse(params.fits) : [];
   const productId = params.product_id ? parseInt(params.product_id, 10) : 0;
+  const selectedVariantId = params.selected_variant_id ? parseInt(params.selected_variant_id, 10) : null;
+
+  // Find the pre-selected color based on the URL's variant
+  const preSelectedColor = selectedVariantId
+    ? colorOptions.find(c => c.variant_id === selectedVariantId) ?? null
+    : null;
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
-  // Form state
-  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
+  // Form state - pre-select color if URL pointed to a specific variant
+  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(preSelectedColor);
   const [isOtherColor, setIsOtherColor] = useState(false);
   const [customColorName, setCustomColorName] = useState('');
   const [selectedFitType, setSelectedFitType] = useState<string | null>(null); // Product fit (Classic, Slim, etc.)
@@ -477,7 +484,7 @@ export default function ConfirmScreen() {
       <View style={styles.header}>
         <Pressable onPress={handleBack} style={styles.backButton}>
           <Text style={styles.backButtonText}>
-            {currentStep === 0 ? '← Cancel' : '← Back'}
+← Back
           </Text>
         </Pressable>
         
