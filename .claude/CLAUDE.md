@@ -95,15 +95,34 @@ This script:
 
 ## Current Status
 
-**Active Work:** UI Polish & Bug Fixes
+**Active Work:** Onboarding Complete - Ready for App Store prep
 
-**Last Updated:** 2025-12-21 by Claude Code (Terminal)
+**Last Updated:** 2025-12-22 by Claude Code (Terminal)
 
 ---
 
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-22
+
+**[Claude Code - Terminal] - Session 14: Onboarding Flow**
+- **Goal:** Add 3-screen onboarding for first-time users (per Product Design Doctrine)
+- **Implementation:**
+  - Created `OnboardingScreen` component with Lottie animations, progress dots, skip button
+  - Created `(onboarding)` route group with 3 screens: welcome, promise, ready
+  - AsyncStorage flag `@tryon/onboarded` for first-time user detection
+  - Root layout checks flag and routes new users through onboarding
+  - Added dev-only "Reset Onboarding" button in Profile for testing
+- **Copy (professional/gender-neutral):**
+  - "Finally know what fits" / "Stop guessing. Start knowing."
+  - "Log fits in seconds" / "Paste a link. Pick your size. Rate the fit."
+  - "Build your fit profile" / "Every fit you log makes your recommendations sharper."
+- **Animations:** Target (precision), Verify checkmark, Growth chart - minimal/premium style
+- **Bug fixed:** Completing onboarding looped back to first screen (state wasn't syncing after AsyncStorage update)
+- **Files created:** `app/(onboarding)/*`, `components/OnboardingScreen.tsx`, `assets/animations/*.json`
+- **Dependency added:** `lottie-react-native`
 
 ### 2025-12-21
 
@@ -304,14 +323,19 @@ Record significant changes here so any AI can catch up quickly.
 
 <!-- Track things that need fixing -->
 
-1. **Database:** 14 unindexed foreign keys (see Supabase advisor)
-2. **Database:** Duplicate indexes to clean up
-3. **Database:** RLS policies need `(select auth.uid())` optimization
-4. **Security:** GitHub token exposed - needs regeneration (GitHub MCP removed for now)
-5. **Security:** `pg_trgm` extension in public schema - move to extensions
-6. **Scrapers:** Banana Republic needs a proper ingest script (`banana_republic_full_ingest.py`) - old `db_utils.py` deprecated, products already in `core.products`
-7. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
-8. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
+1. **Database:** 2 unindexed foreign keys (low priority - `brand_size_mappings.category_id`, `product_consolidation_log.created_by`)
+2. **Database:** 24 unused indexes - review before dropping (may be needed at scale)
+3. **Security:** GitHub token exposed - needs regeneration (GitHub MCP removed for now)
+4. **Auth:** Leaked password protection disabled - enable in Supabase dashboard
+5. **Scrapers:** Banana Republic needs a proper ingest script (`banana_republic_full_ingest.py`) - old `db_utils.py` deprecated, products already in `core.products`
+6. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
+7. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
+
+### Recently Fixed (2025-12-21)
+- ~~RLS initplan on `public.audit_log`~~ - wrapped `auth.role()` in `(select ...)`
+- ~~Function search_path mutable (6 functions)~~ - set immutable search_path
+- ~~`pg_trgm` in public schema~~ - moved to extensions schema
+- ~~Multiple permissive policies on `user_fit_feedback`~~ - consolidated to single policy
 
 ---
 
