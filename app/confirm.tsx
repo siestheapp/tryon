@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -94,9 +94,17 @@ export default function ConfirmScreen() {
 
   // Determine steps dynamically
   // Body-parts step only shows when fit is NOT 'just_right'
+  // Skip fit type step if only 1 option (auto-select it instead)
   const hasColors = colorOptions.length > 0;
-  const hasFitTypes = fitOptions.length > 0;
+  const hasFitTypes = fitOptions.length > 1;
   const needsBodyParts = selectedFit !== null && selectedFit !== 'just_right';
+
+  // Auto-select fit type if there's exactly one option
+  useEffect(() => {
+    if (fitOptions.length === 1 && selectedFitType === null) {
+      setSelectedFitType(fitOptions[0]);
+    }
+  }, [fitOptions, selectedFitType]);
 
   const steps = [
     ...(hasColors ? ['color'] : []),

@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Reiss color variants verified ✓ - Ready for next task
+**Active Work:** Data QA tooling + Reiss fixes complete ✓
 
 **Last Updated:** 2025-12-22 by Claude Code (Terminal)
 
@@ -104,6 +104,25 @@ This script:
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-22
+
+**[Claude Code - Terminal] - Session 17: Data QA Agent + Reiss Fixes**
+- **Created `/data-qa` command** - Analyzes brand data for ingestion anomalies:
+  - Near-duplicate titles (consolidation candidates)
+  - Variant patterns (unusual color/size counts)
+  - Size patterns with embedded fit info (e.g., "US 14.5 R")
+  - Missing data (images, swatches, sizes, brand_product_id)
+  - Product family candidates
+- **Fixed Reiss swatch images:**
+  - Migration `backfill_reiss_swatch_images` - inserted 170 swatch URLs into `product_images`
+  - Migration `product_lookup_use_stored_swatches` - removed brand-specific URL construction, now uses stored swatches for all brands
+  - Data-qa check now passes: 0 variants without swatches
+- **UX improvement:** Skip fit type selection when only 1 option exists
+  - Changed `fitOptions.length > 0` → `> 1` in confirm.tsx
+  - Auto-selects single fit type via useEffect
+  - Products with only "Regular" fit now skip straight to size selection
+- **Documented product families** - Added tech debt item #8 for multi-dimension products (Reiss cuff style × fit × color)
 
 ### 2025-12-22
 
@@ -122,6 +141,7 @@ Record significant changes here so any AI can catch up quickly.
   - ✓ Color swatches load properly
   - ✓ Correct color pre-selected on confirm screen
 - **MCP fix:** `MCP_TIMEOUT=30000 claude` resolved timeout issues
+- **Commits:** `5c723ee` fix: Reiss color variant display, `650ef6f` chore: remove unused permissions
 
 **[Claude Code - Terminal] - Session 15: Reiss Color Variant Fixes**
 - **Verified:** Reiss ingest from Session 14 worked - 84 products with 776 variants
@@ -360,6 +380,7 @@ Record significant changes here so any AI can catch up quickly.
 5. **Scrapers:** Banana Republic needs a proper ingest script (`banana_republic_full_ingest.py`) - old `db_utils.py` deprecated, products already in `core.products`
 6. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
 7. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
+8. **Feature:** Product families - some products (e.g., Reiss dress shirts) have multiple dimensions: Cuff Style (single/double) × Fit (regular/slim) × Color. Currently stored as separate products. Future: add `product_family_id` + `family_dimensions JSONB` to link them and show dimension toggles in app UI (like Reiss website). See: `su615998` (single cuff) vs `su608338` (double cuff).
 
 ### Recently Fixed (2025-12-22)
 - ~~MCP Supabase timing out~~ - use `MCP_TIMEOUT=30000 claude` to start sessions
