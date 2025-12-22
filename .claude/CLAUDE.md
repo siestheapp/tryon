@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Database Schema Refactoring COMPLETE (7/7 phases done)
+**Active Work:** UI Polish & Bug Fixes
 
 **Last Updated:** 2025-12-21 by Claude Code (Terminal)
 
@@ -106,6 +106,19 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-21
+
+**[Claude Code - Terminal] - Session 13: Bug Fix + FitCard Redesign**
+- **Bug fixed:** `get_user_tryons` returning duplicate rows (105x for one item)
+  - Root cause: Fallback image CTE partitioned by `(product_id, variant_id)`, matching all 105 variants when joining by `product_id` alone
+  - Fix: Split into two CTEs - `variant_img` (per variant) and `product_img` (per product, returns 1 row)
+  - Migration: `fix_get_user_tryons_duplicate_rows`
+- **FitCard redesign** (senior product designer approach):
+  - Combined size + fit into single insight pill: "M · Just right"
+  - Added color-coded background tints (green/yellow/red) for instant scanning
+  - Removed redundant date display, removed unused props (bodyParts, why, onEdit, onDelete)
+  - Simplified component from 310 lines → 149 lines
+- **Design decision:** Size + Fit are a single unit of information, not two separate things. "M fits just right" is THE insight users want.
+- **Files changed:** `components/FitCard.tsx`, `app/(tabs)/closet.tsx`
 
 **[Claude Code - Terminal] - Session 12: Phase 7 - Complete Database Refactoring**
 - **Goal:** Add variant_id tracking to complete the database refactoring

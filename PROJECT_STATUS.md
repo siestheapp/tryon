@@ -97,3 +97,11 @@
 - Set up EAS, created freestylefit in App Store Connect
 - First build attempt failed on pods — disabled New Architecture, retrying
 
+### Dec 21, 2025
+- Added v1 component library in `components/`:
+  - **FitCard** — canonical fit object with outcome pill, body-part tags, "why you're seeing this" support
+  - **PredictiveSizeChip** — confidence-aware size chip with predictive defaults
+  - **FitSnapshotCard** — Fit Passport surface showing brand sizes and recent outcomes
+  - **BodyPartChip** — multi-select chips for body-part fit feedback
+- Components ready for integration into closet, confirm flow, and profile screens
+

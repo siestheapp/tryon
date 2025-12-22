@@ -9,17 +9,11 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
 import { useFocusEffect, useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { colors, spacing, borderRadius, typography, components } from '../../theme/tokens';
 import { getUserTryons, TryonHistoryItem, TryonFilter } from '../../lib/supabase';
-
-const FIT_DISPLAY: Record<string, { label: string; color: string }> = {
-  too_small: { label: 'Too Small', color: colors.error },
-  just_right: { label: 'Perfect', color: colors.success },
-  too_large: { label: 'Too Large', color: colors.warning },
-};
+import FitCard, { FitOutcome } from '../../components/FitCard';
 
 export default function ClosetScreen() {
   const router = useRouter();
@@ -72,48 +66,26 @@ export default function ClosetScreen() {
     });
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+  // Map overall_fit to FitOutcome type
+  const mapFitOutcome = (fit: string): FitOutcome => {
+    if (fit === 'too_small' || fit === 'just_right' || fit === 'too_large') {
+      return fit;
+    }
+    return 'just_right'; // default fallback
   };
 
   const renderItem = ({ item }: { item: TryonHistoryItem }) => {
-    const fitInfo = FIT_DISPLAY[item.overall_fit] || {
-      label: item.overall_fit,
-      color: colors.textMuted,
-    };
-
     return (
-      <View style={styles.card}>
-        {item.image_url && (
-          <Image
-            source={{ uri: item.image_url }}
-            style={styles.cardImage}
-            contentFit="cover"
-            transition={200}
-          />
-        )}
-        <View style={styles.cardContent}>
-          <Text style={styles.cardBrand}>{item.brand}</Text>
-          <Text style={styles.cardTitle} numberOfLines={2}>
-            {item.title}
-          </Text>
-          <View style={styles.cardMeta}>
-            <View style={styles.sizeTag}>
-              <Text style={styles.sizeTagText}>Size {item.size_label}</Text>
-            </View>
-            <View style={[styles.fitTag, { backgroundColor: fitInfo.color + '20' }]}>
-              <Text style={[styles.fitTagText, { color: fitInfo.color }]}>
-                {fitInfo.label}
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.cardDate}>{formatDate(item.created_at)}</Text>
-        </View>
+      <View style={styles.cardWrapper}>
+        <FitCard
+          id={item.tryon_id.toString()}
+          productName={item.title}
+          brand={item.brand}
+          image={{ uri: item.image_url || 'https://via.placeholder.com/150' }}
+          sizeChosen={item.size_label}
+          fitOutcome={mapFitOutcome(item.overall_fit)}
+          loggedAt={item.created_at}
+        />
       </View>
     );
   };
@@ -288,59 +260,10 @@ const styles = StyleSheet.create({
   // List
   listContent: {
     paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing['4xl'] * 2, // Extra padding for FAB
+    paddingBottom: spacing['4xl'] * 2,
   },
-  card: {
-    ...components.card,
-    padding: 0,
-    overflow: 'hidden',
-    marginBottom: spacing.lg,
-  },
-  cardImage: {
-    width: '100%',
-    height: 160,
-    backgroundColor: colors.surfaceElevated,
-  },
-  cardContent: {
-    padding: spacing.lg,
-  },
-  cardBrand: {
-    ...typography.caption,
-    color: colors.petrol500,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: spacing.xs,
-  },
-  cardTitle: {
-    ...typography.bodyMedium,
+  cardWrapper: {
     marginBottom: spacing.md,
-  },
-  cardMeta: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  sizeTag: {
-    backgroundColor: colors.surfaceElevated,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.sm,
-  },
-  sizeTagText: {
-    ...typography.caption,
-    color: colors.textPrimary,
-  },
-  fitTag: {
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.sm,
-  },
-  fitTagText: {
-    ...typography.caption,
-    fontWeight: '600',
-  },
-  cardDate: {
-    ...typography.small,
   },
   // Empty state
   emptyState: {

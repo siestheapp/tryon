@@ -1,14 +1,36 @@
-import { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
-import { colors, spacing, typography, components, borderRadius } from '../../theme/tokens';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { colors, spacing, typography, components } from '../../theme/tokens';
 import { useAuth } from '../../lib/auth';
-import { getUserTryons } from '../../lib/supabase';
+import { getUserTryons, TryonHistoryItem } from '../../lib/supabase';
+import FitSnapshotCard from '../../components/FitSnapshotCard';
+import { FitOutcome } from '../../components/FitCard';
+
+// Safe mapping with fallback for invalid database values
+const mapFitOutcome = (fit: string): FitOutcome => {
+  if (fit === 'too_small' || fit === 'just_right' || fit === 'too_large') {
+    return fit;
+  }
+  return 'just_right'; // Safe fallback
+};
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState({ tryons: 0, brands: 0 });
+  const [snapshotData, setSnapshotData] = useState<{
+    topBrands: { brand: string; size: string; outcome?: FitOutcome }[];
+    recentOutcomes: { brand: string; outcome: FitOutcome }[];
+    lastUpdated: string;
+    isEmpty: boolean;
+  }>({
+    topBrands: [],
+    recentOutcomes: [],
+    lastUpdated: new Date().toISOString(),
+    isEmpty: true,
+  });
 
   const fetchStats = useCallback(async () => {
     try {
@@ -18,6 +40,47 @@ export default function ProfileScreen() {
         tryons: tryons.length,
         brands: uniqueBrands.size,
       });
+
+      // Build Fit Snapshot data
+      if (tryons.length > 0) {
+        // Get most recent size per brand (top 5)
+        const brandSizes = new Map<string, { size: string; outcome: FitOutcome }>();
+        tryons.forEach(t => {
+          if (!brandSizes.has(t.brand)) {
+            brandSizes.set(t.brand, {
+              size: t.size_label,
+              outcome: mapFitOutcome(t.overall_fit),
+            });
+          }
+        });
+        const topBrands = Array.from(brandSizes.entries())
+          .slice(0, 5)
+          .map(([brand, data]) => ({
+            brand,
+            size: data.size,
+            outcome: data.outcome,
+          }));
+
+        // Get last 3 outcomes
+        const recentOutcomes = tryons.slice(0, 3).map(t => ({
+          brand: t.brand,
+          outcome: mapFitOutcome(t.overall_fit),
+        }));
+
+        setSnapshotData({
+          topBrands,
+          recentOutcomes,
+          lastUpdated: tryons[0]?.created_at || new Date().toISOString(),
+          isEmpty: false,
+        });
+      } else {
+        setSnapshotData({
+          topBrands: [],
+          recentOutcomes: [],
+          lastUpdated: new Date().toISOString(),
+          isEmpty: true,
+        });
+      }
     } catch (e) {
       console.error('Failed to fetch stats:', e);
     }
@@ -40,13 +103,29 @@ export default function ProfileScreen() {
     );
   };
 
+  const handleLogFit = () => {
+    router.push('/(tabs)/scan');
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Fit Snapshot - Primary Trust Surface */}
+        <View style={styles.snapshotContainer}>
+          <FitSnapshotCard
+            lastUpdated={snapshotData.lastUpdated}
+            topBrands={snapshotData.topBrands}
+            recentOutcomes={snapshotData.recentOutcomes}
+            ctaLabel={snapshotData.isEmpty ? "Log your first fit" : "Log another fit"}
+            onCtaPress={handleLogFit}
+            isEmpty={snapshotData.isEmpty}
+          />
+        </View>
+
         {/* User Info */}
         <View style={styles.userCard}>
           <View style={styles.avatar}>
@@ -89,7 +168,9 @@ export default function ProfileScreen() {
             <Text style={styles.menuItemValue}>1.0.0</Text>
           </View>
         </View>
-      </View>
+
+        <View style={{ height: spacing['4xl'] }} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -102,7 +183,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: spacing['2xl'],
     paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.md,
   },
   title: {
     ...typography.h1,
@@ -110,6 +191,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing['2xl'],
+  },
+  snapshotContainer: {
+    marginBottom: spacing.xl,
   },
   userCard: {
     ...components.card,
@@ -196,6 +280,3 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 });
-
-
-
