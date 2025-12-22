@@ -26,6 +26,7 @@ export interface SizeOption {
 
 export interface ProductLookupResult {
   product_id: number;
+  selected_variant_id: number | null;  // The variant that matches the input URL
   brand: string;
   title: string;
   category: string;
@@ -92,7 +93,7 @@ export async function lookupProduct(url: string): Promise<ProductLookupResult | 
     throw error;
   }
 
-  console.log('[lookupProduct] Response colors:', JSON.stringify(data?.colors, null, 2));
+  console.log('[lookupProduct] Full response:', JSON.stringify(data, null, 2));
   return data as ProductLookupResult | null;
 }
 

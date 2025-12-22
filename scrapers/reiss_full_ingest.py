@@ -463,6 +463,7 @@ def ensure_product(
     category: str,
     raw_payload: Dict[str, object],
     gender: str,
+    brand_product_id: Optional[str] = None,
 ) -> int:
     cur.execute(
         "SELECT id FROM core.products WHERE product_code = %s",
@@ -479,20 +480,21 @@ def ensure_product(
                    base_name = %s,
                    category = %s,
                    raw = %s,
-                   gender = %s
+                   gender = %s,
+                   brand_product_id = COALESCE(brand_product_id, %s)
              WHERE id = %s
             """,
-            (brand_id, title, base_name, category, Json(raw_payload), gender, product_id),
+            (brand_id, title, base_name, category, Json(raw_payload), gender, brand_product_id, product_id),
         )
         return product_id
 
     cur.execute(
         """
-        INSERT INTO core.products (brand_id, product_code, title, base_name, category, raw, gender)
-        VALUES (%s,%s,%s,%s,%s,%s,%s)
+        INSERT INTO core.products (brand_id, product_code, title, base_name, category, raw, gender, brand_product_id)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id
         """,
-        (brand_id, product_code, title, base_name, category, Json(raw_payload), gender),
+        (brand_id, product_code, title, base_name, category, Json(raw_payload), gender, brand_product_id),
     )
     return cur.fetchone()[0]
 
@@ -975,6 +977,7 @@ def ingest_catalog(
             json.dumps(
                 {
                     "style_number": style_number,
+                    "brand_product_id": style_number,
                     "title": title,
                     "base_name": base_name,
                     "category": category,
@@ -1015,6 +1018,7 @@ def ingest_catalog(
                     category,
                     {"base": base_product, "variants": variant_payloads},
                     gender="male",
+                    brand_product_id=style_number,
                 )
                 assign_canonical_category(cur, product_id, brand_id, category)
                 group_slug = slugify(base_name or title)
@@ -1071,7 +1075,7 @@ def ingest_catalog(
             raise RuntimeError(
                 f"Ingest checker detected issues for {product_code}: {issues_text}"
             )
-        print(f"✅ Ingested Reiss {style_number} with {len(variant_records)} variants.")
+        print(f"✅ Ingested Reiss {style_number} (brand_product_id={style_number}, {len(variant_records)} variants)")
         print("   ↳ ingest_checker passed with no issues.")
     except Exception as exc:  # noqa: BLE001
         message = str(exc)

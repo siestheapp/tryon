@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Onboarding Complete - Ready for App Store prep
+**Active Work:** Reiss color variants verified ✓ - Ready for next task
 
 **Last Updated:** 2025-12-22 by Claude Code (Terminal)
 
@@ -106,6 +106,36 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-22
+
+**[Claude Code - Terminal] - Session 16: Reiss Color Variant Testing ✓**
+- **All tests passed** - Verified in iOS simulator with real Reiss URLs
+- **URLs tested:**
+  - `st378878/d43750` → White variant (title correctly shows "White" not "Soft Blue")
+  - `su751998/y12387` → Stone variant (title matches)
+  - `su538118/aw1262` → Navy variant (title correctly shows "Navy" not "White")
+  - `su751989/w46572` → Dark Green variant (title correctly shows "Dark Green" not "Airforce Blue")
+  - `su751989/g19833` → Black variant (title correctly shows "Black" not "Airforce Blue")
+  - `su751989/w55541` → Airforce Blue variant (title matches)
+- **Features verified:**
+  - ✓ Correct image displayed for selected variant
+  - ✓ Title shows correct color name (displayTitle fix working)
+  - ✓ Color swatches load properly
+  - ✓ Correct color pre-selected on confirm screen
+- **MCP fix:** `MCP_TIMEOUT=30000 claude` resolved timeout issues
+
+**[Claude Code - Terminal] - Session 15: Reiss Color Variant Fixes**
+- **Verified:** Reiss ingest from Session 14 worked - 84 products with 776 variants
+- **Scraper fix:** Added `brand_product_id` parameter to `reiss_full_ingest.py`, backfilled existing products
+- **Swatch URL fix:** Discovered Reiss CDN pattern: `https://cdn.platform.next/Common/Items/Default/Default/ItemImages/AltItemSwatch/40x40/{itemNumber}.jpg`
+- **product_lookup updates:**
+  - Added Reiss swatch URL construction from `variant_sku`
+  - Added `selected_variant_id` to indicate which variant matches the input URL
+  - Image now shows correct variant instead of always primary
+- **App fixes:**
+  - `lib/supabase.ts`: Added `selected_variant_id` to `ProductLookupResult` interface
+  - `app/(tabs)/scan.tsx`: Pass `selected_variant_id` to confirm screen, compute `displayTitle` with correct color
+  - `app/confirm.tsx`: Pre-select color based on `selected_variant_id`
+- **Title fix:** Added IIFE in scan.tsx to replace wrong color in title with selected color name
 
 **[Claude Code - Terminal] - Session 14: Onboarding Flow**
 - **Goal:** Add 3-screen onboarding for first-time users (per Product Design Doctrine)
@@ -330,6 +360,9 @@ Record significant changes here so any AI can catch up quickly.
 5. **Scrapers:** Banana Republic needs a proper ingest script (`banana_republic_full_ingest.py`) - old `db_utils.py` deprecated, products already in `core.products`
 6. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
 7. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
+
+### Recently Fixed (2025-12-22)
+- ~~MCP Supabase timing out~~ - use `MCP_TIMEOUT=30000 claude` to start sessions
 
 ### Recently Fixed (2025-12-21)
 - ~~RLS initplan on `public.audit_log`~~ - wrapped `auth.role()` in `(select ...)`

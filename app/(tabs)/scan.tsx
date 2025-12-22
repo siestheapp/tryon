@@ -118,7 +118,24 @@ export default function ScanScreen() {
           )}
 
           {/* Product Card */}
-          {product && (
+          {product && (() => {
+            // Compute the correct title based on selected variant
+            const selectedColor = product.selected_variant_id
+              ? product.colors.find(c => c.variant_id === product.selected_variant_id)
+              : null;
+
+            let displayTitle = product.title;
+            if (selectedColor) {
+              // Replace any other color name in the title with the selected color
+              for (const color of product.colors) {
+                if (product.title.includes(color.color_name) && color.color_name !== selectedColor.color_name) {
+                  displayTitle = product.title.replace(color.color_name, selectedColor.color_name);
+                  break;
+                }
+              }
+            }
+
+            return (
             <View style={styles.productCard}>
               {product.image_url && (
                 <Image
@@ -130,7 +147,7 @@ export default function ScanScreen() {
               )}
               <View style={styles.productInfo}>
                 <Text style={styles.productBrand}>{product.brand}</Text>
-                <Text style={styles.productTitle}>{product.title}</Text>
+                <Text style={styles.productTitle}>{displayTitle}</Text>
               </View>
 
           {/* Continue Button */}
@@ -143,7 +160,7 @@ export default function ScanScreen() {
                   product_id: product.product_id.toString(),
                   selected_variant_id: product.selected_variant_id?.toString() ?? '',
                   brand: product.brand,
-                  title: product.title,
+                  title: displayTitle,
                   category: product.category,
                   image_url: product.image_url ?? '',
                   sizes: JSON.stringify(product.sizes),
@@ -157,7 +174,8 @@ export default function ScanScreen() {
             <Text style={styles.continueButtonText}>Select Size & Rate Fit</Text>
           </Pressable>
             </View>
-          )}
+            );
+          })()}
 
           {/* Empty State */}
           {!product && !loading && !error && (
