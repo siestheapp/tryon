@@ -95,7 +95,7 @@ This script:
 
 ## Current Status
 
-**Active Work:** Data QA tooling + Reiss fixes complete ✓
+**Active Work:** Onboarding polish (partial) - Rive animations deferred to post-MVP
 
 **Last Updated:** 2025-12-22 by Claude Code (Terminal)
 
@@ -106,6 +106,23 @@ This script:
 Record significant changes here so any AI can catch up quickly.
 
 ### 2025-12-22
+
+**[Claude Code - Terminal] - Session 18: Onboarding Animation Polish (Partial)**
+- **Goal:** Upgrade onboarding to agency-grade look based on Gemini's design specs
+- **Implemented:**
+  - `MaskedText` component - text slides up with fade, masked overflow (premium "poured in" effect)
+  - `ProgressDots` component - active dot expands into pill shape
+  - Haptic feedback on CTA and skip buttons (`expo-haptics`)
+  - Staggered text entry timing (headline 300ms, subtext 450ms)
+- **Deferred to post-MVP:**
+  - Custom Rive animations (requires designer to create .riv files)
+  - Gemini provided detailed specs for 3 abstract animations:
+    1. "Ghost Garment" - wireframe scanned into silhouette
+    2. "Deconstructed URL" - URL breaks into floating pills
+    3. "Converging Data" - dots orbit into solid circle
+  - Specs saved for future reference
+- **Dependencies added:** `expo-haptics`, `react-native-reanimated` (fell back to standard Animated API for Expo Go compatibility)
+- **Files created:** `components/MaskedText.tsx`, `components/ProgressDots.tsx`, `babel.config.js`
 
 **[Claude Code - Terminal] - Session 17: Data QA Agent + Reiss Fixes**
 - **Created `/data-qa` command** - Analyzes brand data for ingestion anomalies:

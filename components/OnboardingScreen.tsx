@@ -5,11 +5,13 @@ import {
   Pressable,
   StyleSheet,
   useWindowDimensions,
-  AccessibilityInfo,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LottieView from 'lottie-react-native';
+import * as Haptics from 'expo-haptics';
 import { colors, spacing, typography, components } from '../theme/tokens';
+import { MaskedText } from './MaskedText';
+import { ProgressDots } from './ProgressDots';
 
 export type OnboardingScreenProps = {
   /** Lottie animation source (require statement) */
@@ -43,13 +45,25 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const { height } = useWindowDimensions();
   const animationSize = Math.min(280, height * 0.35);
 
+  // Haptic feedback on CTA press
+  const handleCtaPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onCtaPress();
+  };
+
+  // Haptic feedback on skip
+  const handleSkipPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onSkip?.();
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Skip button */}
       {onSkip && (
         <Pressable
           style={styles.skipButton}
-          onPress={onSkip}
+          onPress={handleSkipPress}
           accessibilityRole="button"
           accessibilityLabel="Skip onboarding"
         >
@@ -59,7 +73,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
 
       {/* Main content */}
       <View style={styles.content}>
-        {/* Animation */}
+        {/* Animation - plays immediately */}
         <View
           style={[styles.animationContainer, { height: animationSize }]}
           accessibilityLabel={`Onboarding illustration for step ${currentStep}`}
@@ -72,37 +86,37 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           />
         </View>
 
-        {/* Text content */}
+        {/* Text content - choreographed entry */}
         <View style={styles.textContainer}>
-          <Text
+          {/* Headline enters at 300ms */}
+          <MaskedText
+            text={headline}
             style={styles.headline}
-            accessibilityRole="header"
-          >
-            {headline}
-          </Text>
-          <Text style={styles.subtext}>{subtext}</Text>
+            delay={300}
+            containerStyle={styles.headlineContainer}
+          />
+
+          {/* Subtext enters at 450ms */}
+          <MaskedText
+            text={subtext}
+            style={styles.subtext}
+            delay={450}
+          />
         </View>
       </View>
 
       {/* Bottom section */}
       <View style={styles.bottomSection}>
-        {/* Progress dots */}
-        <View style={styles.dotsContainer} accessibilityLabel={`Step ${currentStep} of ${totalSteps}`}>
-          {Array.from({ length: totalSteps }, (_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.dot,
-                i + 1 === currentStep && styles.dotActive,
-              ]}
-            />
-          ))}
-        </View>
+        {/* Animated progress dots */}
+        <ProgressDots total={totalSteps} current={currentStep} />
 
-        {/* CTA button */}
+        {/* CTA button with haptic feedback */}
         <Pressable
-          style={styles.ctaButton}
-          onPress={onCtaPress}
+          style={({ pressed }) => [
+            styles.ctaButton,
+            pressed && styles.ctaButtonPressed,
+          ]}
+          onPress={handleCtaPress}
           accessibilityRole="button"
           accessibilityLabel={ctaLabel}
         >
@@ -144,11 +158,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
   },
+  headlineContainer: {
+    marginBottom: spacing.lg,
+  },
   headline: {
     ...typography.h1,
     fontSize: 32,
     textAlign: 'center',
-    marginBottom: spacing.lg,
   },
   subtext: {
     ...typography.body,
@@ -161,24 +177,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['2xl'],
     gap: spacing.xl,
   },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.textMuted,
-  },
-  dotActive: {
-    backgroundColor: colors.petrol500,
-    width: 24,
-  },
   ctaButton: {
     ...components.buttonPrimary,
     paddingVertical: spacing.lg,
+  },
+  ctaButtonPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
   },
   ctaText: {
     ...components.buttonPrimaryText,
