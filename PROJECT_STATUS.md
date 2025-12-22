@@ -1,6 +1,6 @@
 # Freestyle Fit — Project Status
 
-> Last updated: Dec 17, 2025
+> Last updated: Dec 22, 2025
 
 ## 🎯 Current Goal
 **Submit to iOS App Store within 10 days**
@@ -34,6 +34,13 @@
 - [x] Distribution certificate (reused from v10-expo)
 - [x] Provisioning profile generated
 
+### App Store Admin Pack (Docs)
+- [x] Added paste-ready App Store Connect metadata drafts in `docs/appstore/`
+- [x] Added Privacy Policy + Support page templates in `docs/appstore/`
+- [x] Added App Privacy (nutrition label) guidance in `docs/appstore/`
+- [x] Added review notes template in `docs/appstore/`
+- [x] Removed unused iOS Camera/Photo permission prompts from `app.json` (reduces review friction)
+
 ---
 
 ## 🔄 In Progress
@@ -60,6 +67,8 @@
 - [ ] Upload screenshots
 - [ ] Fill in app description
 - [ ] Set age rating
+- [ ] Fill in App Privacy (“nutrition label”) using `docs/appstore/APP_PRIVACY_NUTRITION_LABEL.md`
+- [ ] Paste App Review notes using `docs/appstore/REVIEW_NOTES.md`
 - [ ] Submit for review
 
 ---

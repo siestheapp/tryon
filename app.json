@@ -18,8 +18,6 @@
       "buildNumber": "1",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
-        "NSCameraUsageDescription": "freestylefit needs camera access to take photos of your try-ons.",
-        "NSPhotoLibraryUsageDescription": "freestylefit needs photo library access to save your try-on photos.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },

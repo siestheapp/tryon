@@ -51,6 +51,14 @@
 | Support URL | ⬜ | _Required — can be same as privacy policy_ |
 | Marketing URL | ⬜ | _Optional_ |
 
+**Source-of-truth docs (ready to paste):**
+- `docs/appstore/APP_STORE_CONNECT_METADATA.md`
+- `docs/appstore/PRIVACY_POLICY.md`
+- `docs/appstore/SUPPORT.md`
+- `docs/appstore/APP_PRIVACY_NUTRITION_LABEL.md`
+- `docs/appstore/AGE_RATING.md`
+- `docs/appstore/REVIEW_NOTES.md`
+
 ### Draft Description
 ```
 Stop guessing your size. freestylefit helps you track what fits across brands.
@@ -78,6 +86,7 @@ fit, sizing, try-on, clothing, fashion, wardrobe, size guide, shopping, closet, 
 | Export Compliance | ⬜ | Select "No" (uses HTTPS only, no custom encryption) |
 | Content Rights | ⬜ | Confirm you own the content |
 | Test account for reviewers | ⬜ | Create a test login Apple can use |
+| Review notes | ⬜ | Paste from `docs/appstore/REVIEW_NOTES.md` |
 
 ---
 
