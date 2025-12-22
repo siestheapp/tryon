@@ -1,7 +1,7 @@
 ## Support — freestylefit
 
 If you need help, contact:
-`support@freestylefit.app` (replace with your real support email before publishing)
+`support@freestylefit.net` (replace with your real support email before publishing)
 
 ### Common issues
 - **Can’t sign in**: double-check your email/password and your network connection.
