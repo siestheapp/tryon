@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "freestylefit",
+    "name": "TryOn",
     "slug": "tryon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "scheme": "freestylefit",
+    "scheme": "tryon",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -15,9 +16,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.davey.freestylefit",
-      "buildNumber": "1",
       "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true,
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -27,7 +26,7 @@
         "backgroundColor": "#0B0F14"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.davey.freestylefit"
+      "package": "com.tryon.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -40,11 +39,10 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {},
       "eas": {
         "projectId": "d8bae70c-0701-4ee0-bc37-3d254286ee76"
-      },
-      "router": {}
-    },
-    "owner": "daveys241"
+      }
+    }
   }
 }

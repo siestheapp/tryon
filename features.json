@@ -31,38 +31,44 @@
       {
         "id": "p1-002",
         "name": "Test on physical device via TestFlight",
-        "status": "failing",
-        "notes": "Awaiting TestFlight approval"
+        "status": "passing",
+        "verified_date": "2025-12-22",
+        "notes": "Verified working on physical device"
       },
       {
         "id": "p1-003",
         "name": "App icon (1024x1024)",
-        "status": "failing",
-        "notes": ""
+        "status": "passing",
+        "verified_date": "2025-12-22",
+        "notes": "2048x2048 icon2.png - fs monogram with teal-blue gradient"
       },
       {
         "id": "p1-004",
         "name": "App Store screenshots (6.7\" and 5.5\")",
-        "status": "failing",
-        "notes": ""
+        "status": "passing",
+        "verified_date": "2025-12-22",
+        "notes": "6.7\" screenshots captured from iPhone 16 Pro simulator"
       },
       {
         "id": "p1-005",
         "name": "Privacy policy URL",
-        "status": "failing",
-        "notes": ""
+        "status": "passing",
+        "verified_date": "2025-12-22",
+        "notes": "https://freestylefit.net/appstore/privacy-policy.html"
       },
       {
         "id": "p1-006",
         "name": "App Store metadata (description, keywords, category)",
-        "status": "failing",
-        "notes": ""
+        "status": "passing",
+        "verified_date": "2025-12-22",
+        "notes": "docs/appstore/APP_STORE_CONNECT_METADATA.md - ready to paste"
       },
       {
         "id": "p1-007",
         "name": "Submit for App Store review",
-        "status": "failing",
-        "notes": "Blocked by p1-002 through p1-006"
+        "status": "passing",
+        "verified_date": "2025-12-23",
+        "notes": "Build #9 submitted - iPhone only"
       }
     ]
   },
