@@ -95,15 +95,40 @@ This script:
 
 ## Current Status
 
-**Active Work:** Onboarding polish (partial) - Rive animations deferred to post-MVP
+**Active Work:** App submitted to App Store - awaiting review (build #9)
 
-**Last Updated:** 2025-12-22 by Claude Code (Terminal)
+**Last Updated:** 2025-12-23 by Claude Code (Terminal)
 
 ---
 
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-23
+
+**[Claude Code - Terminal] - Session 19: App Store Submission Complete 🎉**
+- **Goal:** Complete all Phase 1 requirements and submit to App Store
+- **Completed:**
+  - Updated app icon to new "fs" monogram design (2048×2048)
+  - Took iPhone 16 Plus screenshots, resized to 1284×2778 for App Store
+  - Resized screenshots for iPad 13" (2048×2732) - later removed when switching to iPhone-only
+  - Set `supportsTablet: false` in app.json to make app iPhone-only (no iPad screenshots needed)
+  - Built and submitted build #9 via EAS with auto-submit
+  - Filled App Store metadata: description, keywords, privacy policy URL, support URL
+  - Submitted for App Store review
+- **All Phase 1 features now passing:**
+  - p1-001: TestFlight build ✓
+  - p1-002: Physical device test ✓
+  - p1-003: App icon ✓
+  - p1-004: Screenshots ✓
+  - p1-005: Privacy policy URL ✓
+  - p1-006: App Store metadata ✓
+  - p1-007: Submit for review ✓
+- **Files changed:** `app.json`, `assets/icon.png`, `features.json`
+- **Files added:** `assets/screenshots/*` (iPhone and resized versions)
+- **Decision:** iPhone-only for MVP (simpler, no iPad screenshots needed)
+- **Commit:** `05f1c0b` feat: submit freestylefit to App Store (build #9)
 
 ### 2025-12-22
 
