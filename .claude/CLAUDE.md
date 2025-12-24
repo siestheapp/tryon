@@ -95,15 +95,32 @@ This script:
 
 ## Current Status
 
-**Active Work:** App submitted to App Store - awaiting review (build #9)
+**Active Work:** App submitted to App Store - awaiting review (build #9). All known bugs fixed!
 
-**Last Updated:** 2025-12-23 by Claude Code (Terminal)
+**Last Updated:** 2025-12-24 by Claude Code (Terminal)
 
 ---
 
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-24
+
+**[Claude Code - Terminal] - Session 20: All Known Bugs Fixed 🎉**
+- **Goal:** Fix remaining known bugs (bug-001 and bug-002)
+- **bug-001: J.Crew URL matching** ✅
+  - Added J.Crew-specific product code extraction to `resolve_product_by_url`
+  - Now matches by code (e.g., `BE996`) regardless of URL path
+  - Migration: `add_jcrew_product_code_matching`
+- **bug-002: 46 products missing images** ✅
+  - Uniqlo: Backfilled from raw payload - created 137 new variants, 338 images
+  - Banana Republic: Web scraped 4 products, 24 images
+  - rag & bone: Web scraped 5 products, 5 images
+  - Remaining 5 (Lululemon, NN07, Sebago, Thursday Boot): Web scraped
+  - Migrations: `backfill_uniqlo_variants_and_images`, `backfill_banana_republic_images`, `backfill_rag_bone_images`, `backfill_remaining_product_images`
+- **Result:** 0 known bugs remaining, 0 products missing images
+- **Commits:** `b1f19d9`, `39d3256`, `78dcd4b`
 
 ### 2025-12-23
 
@@ -420,9 +437,13 @@ Record significant changes here so any AI can catch up quickly.
 3. **Security:** GitHub token exposed - needs regeneration (GitHub MCP removed for now)
 4. **Auth:** Leaked password protection disabled - enable in Supabase dashboard
 5. **Scrapers:** Banana Republic needs a proper ingest script (`banana_republic_full_ingest.py`) - old `db_utils.py` deprecated, products already in `core.products`
-6. **Scrapers:** rag & bone has no scraper (5 products added manually, no images)
-7. **Scrapers:** Need to re-run Uniqlo scraper to populate images for existing 32 products
-8. **Feature:** Product families - some products (e.g., Reiss dress shirts) have multiple dimensions: Cuff Style (single/double) × Fit (regular/slim) × Color. Currently stored as separate products. Future: add `product_family_id` + `family_dimensions JSONB` to link them and show dimension toggles in app UI (like Reiss website). See: `su615998` (single cuff) vs `su608338` (double cuff).
+6. **Feature:** Product families - some products (e.g., Reiss dress shirts) have multiple dimensions: Cuff Style (single/double) × Fit (regular/slim) × Color. Currently stored as separate products. Future: add `product_family_id` + `family_dimensions JSONB` to link them and show dimension toggles in app UI (like Reiss website). See: `su615998` (single cuff) vs `su608338` (double cuff).
+
+### Recently Fixed (2025-12-24)
+- ~~rag & bone missing images~~ - web scraped 5 products
+- ~~Uniqlo missing images~~ - backfilled 32 products from raw payload (338 images)
+- ~~bug-001: J.Crew URL matching~~ - added product code extraction
+- ~~bug-002: 46 products missing images~~ - all products now have images
 
 ### Recently Fixed (2025-12-22)
 - ~~MCP Supabase timing out~~ - use `MCP_TIMEOUT=30000 claude` to start sessions
