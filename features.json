@@ -171,8 +171,9 @@
       {
         "id": "bug-001",
         "name": "URL matching requires exact match (AY960 != BE996)",
-        "status": "failing",
-        "notes": "Product URLs must match DB exactly - may need fuzzy matching"
+        "status": "passing",
+        "verified_date": "2025-12-23",
+        "notes": "Added J.Crew product code matching to resolve_product_by_url. Now extracts code from URL path (e.g., BE996) and matches by product_code column. Different paths same code now resolve correctly."
       },
       {
         "id": "bug-002",
