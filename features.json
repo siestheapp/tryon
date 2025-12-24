@@ -178,8 +178,9 @@
       {
         "id": "bug-002",
         "name": "48 products missing images (Uniqlo, rag & bone, Banana Republic)",
-        "status": "in_progress",
-        "notes": "Backfilled Uniqlo: 32 products now have 338 images (169 variants). Remaining: 14 products (4 BR, 5 rag & bone, 2 Lululemon, 1 NN07, 1 Sebago, 1 Thursday Boot). Most have URLs for future scraping."
+        "status": "passing",
+        "verified_date": "2025-12-23",
+        "notes": "All 46 products now have images. Migrations: backfill_uniqlo_variants_and_images (32 products, 338 images), backfill_banana_republic_images (4 products), backfill_rag_bone_images (5 products), backfill_remaining_product_images (5 products)."
       }
     ]
   },
