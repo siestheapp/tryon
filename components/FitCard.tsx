@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Image,
   ImageSourcePropType,
@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useTheme } from '../theme';
 
 export type FitOutcome = 'too_small' | 'just_right' | 'too_large';
 
@@ -36,12 +37,6 @@ const OUTCOME_LABEL: Record<FitOutcome, string> = {
   too_large: 'Too large',
 };
 
-const OUTCOME_COLORS: Record<FitOutcome, { dot: string; bg: string; border: string }> = {
-  too_small: { dot: '#f87171', bg: 'rgba(248, 113, 113, 0.1)', border: 'rgba(248, 113, 113, 0.3)' },
-  just_right: { dot: '#4ade80', bg: 'rgba(74, 222, 128, 0.1)', border: 'rgba(74, 222, 128, 0.3)' },
-  too_large: { dot: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', border: 'rgba(251, 191, 36, 0.3)' },
-};
-
 const FitCard: React.FC<FitCardProps> = ({
   id,
   productName,
@@ -52,11 +47,96 @@ const FitCard: React.FC<FitCardProps> = ({
   onPress,
   isSkeleton,
 }) => {
+  const { theme, spacing, radius } = useTheme();
+
+  // Get outcome colors from theme
+  const outcomeColors = useMemo(() => ({
+    too_small: {
+      dot: theme.colors.fitTooSmall,
+      bg: theme.colors.fitTooSmallMuted,
+      border: theme.colors.fitTooSmall + '4D', // 30% opacity
+    },
+    just_right: {
+      dot: theme.colors.fitPerfect,
+      bg: theme.colors.fitPerfectMuted,
+      border: theme.colors.fitPerfect + '4D',
+    },
+    too_large: {
+      dot: theme.colors.fitTooLarge,
+      bg: theme.colors.fitTooLargeMuted,
+      border: theme.colors.fitTooLarge + '4D',
+    },
+  }), [theme]);
+
+  const colors = outcomeColors[fitOutcome];
+
+  const styles = useMemo(() => StyleSheet.create({
+    card: {
+      flexDirection: 'row',
+      padding: spacing.md,
+      borderRadius: radius.md,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    cardPressed: {
+      opacity: 0.85,
+      transform: [{ scale: 0.98 }],
+    },
+    cardSkeleton: {
+      opacity: 0.6,
+    },
+    image: {
+      width: 80,
+      height: 100,
+      borderRadius: radius.sm,
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    content: {
+      flex: 1,
+      marginLeft: spacing.lg,
+      justifyContent: 'center',
+    },
+    brand: {
+      color: theme.colors.textMuted,
+      fontSize: 13,
+      fontWeight: '500',
+      letterSpacing: 0.2,
+    },
+    product: {
+      color: theme.colors.textPrimary,
+      fontSize: 15,
+      fontWeight: '600',
+      marginTop: 2,
+      lineHeight: 20,
+    },
+    fitPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.full,
+      borderWidth: 1,
+      marginTop: spacing.md,
+    },
+    fitDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginRight: spacing.sm,
+    },
+    fitText: {
+      color: theme.colors.textPrimary,
+      fontSize: 13,
+      fontWeight: '600',
+    },
+  }), [theme, spacing, radius]);
+
   const handlePress = () => {
     if (onPress) onPress(id);
   };
 
-  const colors = OUTCOME_COLORS[fitOutcome];
   const accessibilityLabel = `${brand} ${productName}, size ${sizeChosen}, ${OUTCOME_LABEL[fitOutcome]}`;
 
   return (
@@ -90,69 +170,4 @@ const FitCard: React.FC<FitCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#111218',
-    borderWidth: 1,
-    borderColor: '#1f212a',
-  },
-  cardPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  cardSkeleton: {
-    opacity: 0.6,
-  },
-  image: {
-    width: 80,
-    height: 100,
-    borderRadius: 8,
-    backgroundColor: '#1c1e26',
-  },
-  content: {
-    flex: 1,
-    marginLeft: 14,
-    justifyContent: 'center',
-  },
-  brand: {
-    color: '#9ca3af',
-    fontSize: 13,
-    fontWeight: '500',
-    letterSpacing: 0.2,
-  },
-  product: {
-    color: '#f3f4f6',
-    fontSize: 15,
-    fontWeight: '600',
-    marginTop: 2,
-    lineHeight: 20,
-  },
-  fitPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    marginTop: 10,
-  },
-  fitDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  fitText: {
-    color: '#f3f4f6',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-});
-
 export default FitCard;
-
-

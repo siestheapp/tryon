@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,16 +12,105 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
-import { colors, spacing, borderRadius, typography, components } from '../../theme/tokens';
+import { useTheme } from '../../theme';
 import { useAuth } from '../../lib/auth';
 
 export default function SignInScreen() {
+  const { theme, spacing, radius, fontSize, fontWeight } = useTheme();
   const router = useRouter();
   const { signIn } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: spacing['2xl'],
+      justifyContent: 'center',
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing['3xl'],
+    },
+    logo: {
+      fontSize: 64,
+      marginBottom: spacing.lg,
+    },
+    title: {
+      fontSize: fontSize['2xl'],
+      fontWeight: fontWeight.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subtitle: {
+      fontSize: fontSize.base,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    form: {
+      gap: spacing.lg,
+    },
+    inputGroup: {
+      gap: spacing.sm,
+    },
+    label: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+    },
+    input: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      fontSize: fontSize.base,
+      color: theme.colors.textPrimary,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: spacing.md,
+    },
+    buttonDisabled: {
+      backgroundColor: theme.colors.border,
+    },
+    buttonText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.semibold,
+      color: theme.colors.textOnPrimary,
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: spacing['3xl'],
+      gap: spacing.xs,
+    },
+    footerText: {
+      fontSize: fontSize.base,
+      color: theme.colors.textSecondary,
+    },
+    linkText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.primary,
+    },
+  }), [theme, spacing, radius, fontSize, fontWeight]);
 
   const handleSignIn = async () => {
     if (!email.trim() || !password) {
@@ -63,7 +152,7 @@ export default function SignInScreen() {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
-                placeholderTextColor={colors.textMuted}
+                placeholderTextColor={theme.colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="email-address"
@@ -79,7 +168,7 @@ export default function SignInScreen() {
                 value={password}
                 onChangeText={setPassword}
                 placeholder="••••••••"
-                placeholderTextColor={colors.textMuted}
+                placeholderTextColor={theme.colors.textMuted}
                 secureTextEntry
                 textContentType="password"
                 autoComplete="password"
@@ -92,7 +181,7 @@ export default function SignInScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={theme.colors.textOnPrimary} size="small" />
               ) : (
                 <Text style={styles.buttonText}>Sign In</Text>
               )}
@@ -113,74 +202,3 @@ export default function SignInScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing['2xl'],
-    justifyContent: 'center',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing['3xl'],
-  },
-  logo: {
-    fontSize: 64,
-    marginBottom: spacing.lg,
-  },
-  title: {
-    ...typography.h1,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    ...typography.body,
-    textAlign: 'center',
-  },
-  form: {
-    gap: spacing.lg,
-  },
-  inputGroup: {
-    gap: spacing.sm,
-  },
-  label: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  input: {
-    ...components.input,
-  },
-  button: {
-    ...components.buttonPrimary,
-    marginTop: spacing.md,
-  },
-  buttonDisabled: {
-    backgroundColor: colors.border,
-  },
-  buttonText: {
-    ...components.buttonPrimaryText,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing['3xl'],
-    gap: spacing.xs,
-  },
-  footerText: {
-    ...typography.body,
-  },
-  linkText: {
-    ...typography.bodyMedium,
-    color: colors.petrol500,
-  },
-});
-
-
-

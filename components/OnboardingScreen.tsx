@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LottieView from 'lottie-react-native';
 import * as Haptics from 'expo-haptics';
-import { colors, spacing, typography, components } from '../theme/tokens';
+import { useTheme } from '../theme';
 import { MaskedText } from './MaskedText';
 import { ProgressDots } from './ProgressDots';
 
@@ -42,8 +42,81 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   totalSteps,
   onSkip,
 }) => {
+  const { theme, spacing, radius, fontSize, fontWeight } = useTheme();
   const { height } = useWindowDimensions();
   const animationSize = Math.min(280, height * 0.35);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    skipButton: {
+      position: 'absolute',
+      top: 60,
+      right: spacing['2xl'],
+      zIndex: 10,
+      padding: spacing.sm,
+    },
+    skipText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textMuted,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: spacing['2xl'],
+    },
+    animationContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing['3xl'],
+    },
+    textContainer: {
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+    },
+    headlineContainer: {
+      marginBottom: spacing.lg,
+    },
+    headline: {
+      fontSize: 32,
+      fontWeight: fontWeight.bold,
+      textAlign: 'center',
+      color: theme.colors.textPrimary,
+    },
+    subtext: {
+      fontSize: fontSize.lg,
+      fontWeight: fontWeight.regular,
+      textAlign: 'center',
+      lineHeight: 26,
+      color: theme.colors.textSecondary,
+    },
+    bottomSection: {
+      paddingHorizontal: spacing['2xl'],
+      paddingBottom: spacing['2xl'],
+      gap: spacing.xl,
+    },
+    ctaButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    ctaButtonPressed: {
+      opacity: 0.9,
+      transform: [{ scale: 0.98 }],
+    },
+    ctaText: {
+      fontSize: fontSize.lg,
+      fontWeight: fontWeight.semibold,
+      color: theme.colors.textOnPrimary,
+    },
+  }), [theme, spacing, radius, fontSize, fontWeight]);
 
   // Haptic feedback on CTA press
   const handleCtaPress = () => {
@@ -126,69 +199,5 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  skipButton: {
-    position: 'absolute',
-    top: 60,
-    right: spacing['2xl'],
-    zIndex: 10,
-    padding: spacing.sm,
-  },
-  skipText: {
-    ...typography.bodyMedium,
-    color: colors.textMuted,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing['2xl'],
-  },
-  animationContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing['3xl'],
-  },
-  textContainer: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  headlineContainer: {
-    marginBottom: spacing.lg,
-  },
-  headline: {
-    ...typography.h1,
-    fontSize: 32,
-    textAlign: 'center',
-  },
-  subtext: {
-    ...typography.body,
-    fontSize: 18,
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-  bottomSection: {
-    paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing['2xl'],
-    gap: spacing.xl,
-  },
-  ctaButton: {
-    ...components.buttonPrimary,
-    paddingVertical: spacing.lg,
-  },
-  ctaButtonPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-  ctaText: {
-    ...components.buttonPrimaryText,
-    fontSize: 18,
-  },
-});
 
 export default OnboardingScreen;

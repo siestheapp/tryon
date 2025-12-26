@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,143 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { colors, spacing, borderRadius, typography, components } from '../../theme/tokens';
+import { useTheme } from '../../theme';
 import { getUserTryons, TryonHistoryItem, TryonFilter } from '../../lib/supabase';
 import FitCard, { FitOutcome } from '../../components/FitCard';
 
 export default function ClosetScreen() {
+  const { theme, spacing, radius, fontSize, fontWeight, getShadow } = useTheme();
   const router = useRouter();
   const [tryons, setTryons] = useState<TryonHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TryonFilter>('owned');
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      paddingHorizontal: spacing['2xl'],
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    title: {
+      fontSize: fontSize['2xl'],
+      fontWeight: fontWeight.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    subtitle: {
+      fontSize: fontSize.base,
+      color: theme.colors.textSecondary,
+    },
+    // Filter toggle
+    filterContainer: {
+      flexDirection: 'row',
+      marginHorizontal: spacing['2xl'],
+      marginBottom: spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.xs,
+    },
+    filterTab: {
+      flex: 1,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+      borderRadius: radius.md,
+    },
+    filterTabActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    filterTabText: {
+      fontSize: 14,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textMuted,
+    },
+    filterTabTextActive: {
+      color: theme.colors.textOnPrimary,
+      fontWeight: fontWeight.semibold,
+    },
+    // Loading & Error
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: spacing['3xl'],
+    },
+    errorText: {
+      fontSize: fontSize.base,
+      color: theme.colors.error,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    retryButton: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: radius.md,
+      alignItems: 'center',
+    },
+    retryButtonText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.semibold,
+      color: theme.colors.textPrimary,
+    },
+    // List
+    listContent: {
+      paddingHorizontal: spacing['2xl'],
+      paddingBottom: spacing['4xl'] * 2,
+    },
+    cardWrapper: {
+      marginBottom: spacing.md,
+    },
+    // Empty state
+    emptyState: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: spacing['3xl'],
+      paddingTop: spacing['4xl'] * 2,
+    },
+    emptyStateEmoji: {
+      fontSize: 64,
+      marginBottom: spacing.lg,
+    },
+    emptyStateTitle: {
+      fontSize: fontSize.xl,
+      fontWeight: fontWeight.semibold,
+      color: theme.colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    emptyStateText: {
+      fontSize: fontSize.base,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    // FAB
+    fab: {
+      position: 'absolute',
+      right: spacing['2xl'],
+      bottom: spacing['2xl'],
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: theme.colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...getShadow('lg'),
+    },
+  }), [theme, spacing, radius, fontSize, fontWeight, getShadow]);
 
   const fetchTryons = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) {
@@ -147,7 +273,7 @@ export default function ClosetScreen() {
       {/* Loading */}
       {loading && !refreshing && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.petrol500} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       )}
 
@@ -174,8 +300,8 @@ export default function ClosetScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              tintColor={colors.petrol500}
-              colors={[colors.petrol500]}
+              tintColor={theme.colors.primary}
+              colors={[theme.colors.primary]}
             />
           }
         />
@@ -183,123 +309,8 @@ export default function ClosetScreen() {
 
       {/* FAB */}
       <Pressable style={styles.fab} onPress={handleAddItem}>
-        <Ionicons name="add" size={28} color="#FFFFFF" />
+        <Ionicons name="add" size={28} color={theme.colors.textOnPrimary} />
       </Pressable>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: spacing['2xl'],
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  title: {
-    ...typography.h1,
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    ...typography.body,
-  },
-  // Filter toggle
-  filterContainer: {
-    flexDirection: 'row',
-    marginHorizontal: spacing['2xl'],
-    marginBottom: spacing.lg,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.xs,
-  },
-  filterTab: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-    borderRadius: borderRadius.md,
-  },
-  filterTabActive: {
-    backgroundColor: colors.petrol500,
-  },
-  filterTabText: {
-    ...typography.bodyMedium,
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  filterTabTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  // Loading & Error
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing['3xl'],
-  },
-  errorText: {
-    ...typography.body,
-    color: colors.error,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  retryButton: {
-    ...components.buttonSecondary,
-  },
-  retryButtonText: {
-    ...components.buttonSecondaryText,
-  },
-  // List
-  listContent: {
-    paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing['4xl'] * 2,
-  },
-  cardWrapper: {
-    marginBottom: spacing.md,
-  },
-  // Empty state
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing['3xl'],
-    paddingTop: spacing['4xl'] * 2,
-  },
-  emptyStateEmoji: {
-    fontSize: 64,
-    marginBottom: spacing.lg,
-  },
-  emptyStateTitle: {
-    ...typography.h2,
-    marginBottom: spacing.sm,
-  },
-  emptyStateText: {
-    ...typography.body,
-    textAlign: 'center',
-  },
-  // FAB
-  fab: {
-    position: 'absolute',
-    right: spacing['2xl'],
-    bottom: spacing['2xl'],
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.petrol500,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 8,
-  },
-});

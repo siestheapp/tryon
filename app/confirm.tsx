@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { colors, spacing, borderRadius, typography, components } from '../theme/tokens';
+import { useTheme } from '../theme';
 import { saveTryon, FitRating, BodyPartFit, LengthFit, SizeOption } from '../lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -49,6 +49,7 @@ interface ColorOption {
 }
 
 export default function ConfirmScreen() {
+  const { theme, spacing, radius, fontSize, fontWeight } = useTheme();
   const router = useRouter();
   const params = useLocalSearchParams<{
     product_id: string;
@@ -115,6 +116,371 @@ export default function ConfirmScreen() {
     'ownership',
   ];
   const totalSteps = steps.length;
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.md,
+    },
+    backButton: {
+      width: 80,
+    },
+    backButtonText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.primary,
+    },
+    progressContainer: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    progressDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: theme.colors.border,
+    },
+    progressDotActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    headerSpacer: {
+      width: 80,
+    },
+    productMini: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: spacing.xl,
+      marginBottom: spacing.lg,
+      padding: spacing.md,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.md,
+      gap: spacing.md,
+    },
+    productMiniImage: {
+      width: 48,
+      height: 48,
+      borderRadius: radius.sm,
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    productMiniInfo: {
+      flex: 1,
+    },
+    productMiniBrand: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.primary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    productMiniTitle: {
+      fontSize: 14,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textPrimary,
+    },
+    wizardContainer: {
+      flex: 1,
+      overflow: 'hidden',
+    },
+    stepsRow: {
+      flexDirection: 'row',
+      flex: 1,
+    },
+    stepWrapper: {
+      width: SCREEN_WIDTH,
+      paddingHorizontal: spacing.xl,
+    },
+    stepContent: {
+      flex: 1,
+      paddingTop: spacing.xl,
+    },
+    stepQuestion: {
+      fontSize: fontSize.xl,
+      fontWeight: fontWeight.semibold,
+      color: theme.colors.textPrimary,
+      textAlign: 'center',
+      marginBottom: spacing['2xl'],
+    },
+    // Color grid
+    colorGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: spacing.md,
+    },
+    colorSwatch: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      borderWidth: 3,
+      borderColor: 'transparent',
+      overflow: 'hidden',
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    colorSwatchSelected: {
+      borderColor: theme.colors.primary,
+    },
+    colorSwatchImage: {
+      width: '100%',
+      height: '100%',
+    },
+    colorSwatchHex: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 30,
+    },
+    colorSwatchFallback: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    colorSwatchFallbackText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textMuted,
+    },
+    colorSwatchOther: {
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      borderStyle: 'dashed',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    colorSwatchOtherText: {
+      fontSize: 28,
+      color: theme.colors.textMuted,
+    },
+    selectedLabel: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginTop: spacing.lg,
+    },
+    customInput: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      fontSize: fontSize.base,
+      color: theme.colors.textPrimary,
+      marginTop: spacing.lg,
+      textAlign: 'center',
+    },
+    // Fit type grid (Classic, Slim, Tall, etc.)
+    fitTypeGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: spacing.md,
+    },
+    fitTypeChip: {
+      minWidth: 100,
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      alignItems: 'center',
+    },
+    fitTypeChipSelected: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    fitTypeChipText: {
+      fontSize: 16,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+    },
+    fitTypeChipTextSelected: {
+      color: theme.colors.textOnPrimary,
+      fontWeight: fontWeight.semibold,
+    },
+    // Size grid
+    sizeGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: spacing.sm,
+    },
+    sizeChip: {
+      minWidth: 56,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      alignItems: 'center',
+    },
+    sizeChipSelected: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    sizeChipText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+    },
+    sizeChipTextSelected: {
+      color: theme.colors.textOnPrimary,
+      fontWeight: fontWeight.semibold,
+    },
+    // Fit grid
+    fitGrid: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: spacing.md,
+    },
+    fitCard: {
+      width: 100,
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    fitCardSelected: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primaryMuted,
+    },
+    fitEmoji: {
+      fontSize: 40,
+      marginBottom: spacing.sm,
+    },
+    fitLabel: {
+      fontSize: 13,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+    },
+    fitLabelSelected: {
+      color: theme.colors.primary,
+    },
+    notesInput: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      fontSize: fontSize.base,
+      color: theme.colors.textPrimary,
+      marginTop: spacing['2xl'],
+      minHeight: 80,
+      textAlignVertical: 'top',
+      paddingTop: spacing.md,
+    },
+    // Body parts grid
+    stepSubtitle: {
+      fontSize: fontSize.base,
+      color: theme.colors.textMuted,
+      textAlign: 'center',
+      marginTop: -spacing.lg,
+      marginBottom: spacing.xl,
+    },
+    bodyPartsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: spacing.md,
+    },
+    bodyPartChip: {
+      width: '45%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.md,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      gap: spacing.sm,
+    },
+    bodyPartChipSelected: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primaryMuted,
+    },
+    bodyPartIcon: {
+      fontSize: 24,
+    },
+    bodyPartLabel: {
+      fontSize: 14,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+      flex: 1,
+    },
+    bodyPartLabelSelected: {
+      color: theme.colors.primary,
+      fontWeight: fontWeight.semibold,
+    },
+    // Ownership grid
+    ownershipGrid: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: spacing.lg,
+    },
+    ownershipCard: {
+      width: 140,
+      alignItems: 'center',
+      paddingVertical: spacing['2xl'],
+      paddingHorizontal: spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    ownershipCardSelected: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primaryMuted,
+    },
+    ownershipIcon: {
+      fontSize: 48,
+      marginBottom: spacing.md,
+    },
+    ownershipLabel: {
+      fontSize: 14,
+      fontWeight: fontWeight.medium,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    ownershipLabelSelected: {
+      color: theme.colors.primary,
+      fontWeight: fontWeight.semibold,
+    },
+    // Footer
+    footer: {
+      padding: spacing.xl,
+      paddingBottom: spacing.md,
+    },
+    actionButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    actionButtonDisabled: {
+      backgroundColor: theme.colors.border,
+    },
+    actionButtonText: {
+      fontSize: fontSize.base,
+      fontWeight: fontWeight.semibold,
+      color: theme.colors.textOnPrimary,
+    },
+  }), [theme, spacing, radius, fontSize, fontWeight]);
 
   const animateToStep = (step: number) => {
     Animated.spring(slideAnim, {
@@ -288,7 +654,7 @@ export default function ConfirmScreen() {
           value={customColorName}
           onChangeText={setCustomColorName}
           placeholder="Enter color name..."
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={theme.colors.textMuted}
           autoFocus
         />
       )}
@@ -383,7 +749,7 @@ export default function ConfirmScreen() {
         value={notes}
         onChangeText={setNotes}
         placeholder="Notes (optional)"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={theme.colors.textMuted}
         multiline
         numberOfLines={2}
       />
@@ -556,7 +922,7 @@ export default function ConfirmScreen() {
           disabled={!canProceed() || saving}
         >
           {saving ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <ActivityIndicator color={theme.colors.textOnPrimary} size="small" />
           ) : (
             <Text style={styles.actionButtonText}>
               {isLastStep ? 'Save Try-On ✓' : 'Next →'}
@@ -567,342 +933,3 @@ export default function ConfirmScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-  },
-  backButton: {
-    width: 80,
-  },
-  backButtonText: {
-    ...typography.bodyMedium,
-    color: colors.petrol500,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.border,
-  },
-  progressDotActive: {
-    backgroundColor: colors.petrol500,
-  },
-  headerSpacer: {
-    width: 80,
-  },
-  productMini: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: spacing.xl,
-    marginBottom: spacing.lg,
-    padding: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.md,
-    gap: spacing.md,
-  },
-  productMiniImage: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.sm,
-    backgroundColor: colors.surfaceElevated,
-  },
-  productMiniInfo: {
-    flex: 1,
-  },
-  productMiniBrand: {
-    ...typography.caption,
-    color: colors.petrol500,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  productMiniTitle: {
-    ...typography.bodyMedium,
-    fontSize: 14,
-  },
-  wizardContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  stepsRow: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  stepWrapper: {
-    width: SCREEN_WIDTH,
-    paddingHorizontal: spacing.xl,
-  },
-  stepContent: {
-    flex: 1,
-    paddingTop: spacing.xl,
-  },
-  stepQuestion: {
-    ...typography.h2,
-    textAlign: 'center',
-    marginBottom: spacing['2xl'],
-  },
-  // Color grid
-  colorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.md,
-  },
-  colorSwatch: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 3,
-    borderColor: 'transparent',
-    overflow: 'hidden',
-    backgroundColor: colors.surfaceElevated,
-  },
-  colorSwatchSelected: {
-    borderColor: colors.petrol500,
-  },
-  colorSwatchImage: {
-    width: '100%',
-    height: '100%',
-  },
-  colorSwatchHex: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 30,
-  },
-  colorSwatchFallback: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceElevated,
-  },
-  colorSwatchFallbackText: {
-    ...typography.bodyMedium,
-    color: colors.textMuted,
-  },
-  colorSwatchOther: {
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  colorSwatchOtherText: {
-    fontSize: 28,
-    color: colors.textMuted,
-  },
-  selectedLabel: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: spacing.lg,
-  },
-  customInput: {
-    ...components.input,
-    marginTop: spacing.lg,
-    textAlign: 'center',
-  },
-  // Fit type grid (Classic, Slim, Tall, etc.)
-  fitTypeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.md,
-  },
-  fitTypeChip: {
-    minWidth: 100,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  fitTypeChipSelected: {
-    backgroundColor: colors.petrol500,
-    borderColor: colors.petrol500,
-  },
-  fitTypeChipText: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 16,
-  },
-  fitTypeChipTextSelected: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  // Size grid
-  sizeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  sizeChip: {
-    minWidth: 56,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  sizeChipSelected: {
-    backgroundColor: colors.petrol500,
-    borderColor: colors.petrol500,
-  },
-  sizeChipText: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-  },
-  sizeChipTextSelected: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  // Fit grid
-  fitGrid: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.md,
-  },
-  fitCard: {
-    width: 100,
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border,
-  },
-  fitCardSelected: {
-    borderColor: colors.petrol500,
-    backgroundColor: 'rgba(0, 163, 163, 0.1)',
-  },
-  fitEmoji: {
-    fontSize: 40,
-    marginBottom: spacing.sm,
-  },
-  fitLabel: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-  fitLabelSelected: {
-    color: colors.petrol400,
-  },
-  notesInput: {
-    ...components.input,
-    marginTop: spacing['2xl'],
-    minHeight: 80,
-    textAlignVertical: 'top',
-    paddingTop: spacing.md,
-  },
-  // Body parts grid
-  stepSubtitle: {
-    ...typography.body,
-    color: colors.textMuted,
-    textAlign: 'center',
-    marginTop: -spacing.lg,
-    marginBottom: spacing.xl,
-  },
-  bodyPartsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.md,
-  },
-  bodyPartChip: {
-    width: '45%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border,
-    gap: spacing.sm,
-  },
-  bodyPartChipSelected: {
-    borderColor: colors.petrol500,
-    backgroundColor: 'rgba(0, 163, 163, 0.1)',
-  },
-  bodyPartIcon: {
-    fontSize: 24,
-  },
-  bodyPartLabel: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 14,
-    flex: 1,
-  },
-  bodyPartLabelSelected: {
-    color: colors.petrol500,
-    fontWeight: '600',
-  },
-  // Ownership grid
-  ownershipGrid: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.lg,
-  },
-  ownershipCard: {
-    width: 140,
-    alignItems: 'center',
-    paddingVertical: spacing['2xl'],
-    paddingHorizontal: spacing.lg,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border,
-  },
-  ownershipCardSelected: {
-    borderColor: colors.petrol500,
-    backgroundColor: 'rgba(0, 163, 163, 0.1)',
-  },
-  ownershipIcon: {
-    fontSize: 48,
-    marginBottom: spacing.md,
-  },
-  ownershipLabel: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    fontSize: 14,
-  },
-  ownershipLabelSelected: {
-    color: colors.petrol500,
-    fontWeight: '600',
-  },
-  // Footer
-  footer: {
-    padding: spacing.xl,
-    paddingBottom: spacing.md,
-  },
-  actionButton: {
-    ...components.buttonPrimary,
-  },
-  actionButtonDisabled: {
-    backgroundColor: colors.border,
-  },
-  actionButtonText: {
-    ...components.buttonPrimaryText,
-  },
-});
-
-
-

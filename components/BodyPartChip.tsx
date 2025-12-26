@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-
+import { useTheme } from '../theme';
 import { BodyPart } from './FitCard';
 
 export type BodyPartChipProps = {
@@ -18,6 +18,36 @@ const BodyPartChip: React.FC<BodyPartChipProps> = ({
   disabled,
   onToggle,
 }) => {
+  const { theme, spacing, radius } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    chip: {
+      minHeight: 44,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      borderRadius: radius.md,
+      backgroundColor: theme.colors.backgroundSecondary,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      justifyContent: 'center',
+    },
+    chipSelected: {
+      borderColor: theme.colors.fitPerfect,
+      backgroundColor: theme.colors.fitPerfectMuted,
+    },
+    chipPressed: {
+      opacity: 0.9,
+    },
+    text: {
+      color: theme.colors.textSecondary,
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    textSelected: {
+      color: theme.colors.textPrimary,
+    },
+  }), [theme, spacing, radius]);
+
   const handlePress = () => {
     if (!disabled) onToggle(part);
   };
@@ -41,35 +71,4 @@ const BodyPartChip: React.FC<BodyPartChipProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  chip: {
-    minHeight: 44,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: '#1b1d25',
-    borderWidth: 1,
-    borderColor: '#2a2d38',
-    justifyContent: 'center',
-  },
-  chipSelected: {
-    borderColor: '#5be88a',
-    backgroundColor: '#14251b',
-  },
-  chipPressed: {
-    opacity: 0.9,
-  },
-  text: {
-    color: '#cfd2e0',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  textSelected: {
-    color: '#e7e9f2',
-  },
-});
-
 export default BodyPartChip;
-
-
-

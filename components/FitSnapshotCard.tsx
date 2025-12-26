@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-
+import { useTheme } from '../theme';
 import { FitOutcome } from './FitCard';
 
 export type FitSnapshotBrand = { brand: string; size: string; outcome?: FitOutcome };
@@ -20,12 +20,6 @@ const OUTCOME_SYMBOL: Record<FitOutcome, string> = {
   too_large: '–',
 };
 
-const OUTCOME_COLOR: Record<FitOutcome, string> = {
-  just_right: '#5be88a',
-  too_small: '#e8895b',
-  too_large: '#e8c45b',
-};
-
 const FitSnapshotCard: React.FC<FitSnapshotProps> = ({
   lastUpdated,
   topBrands,
@@ -34,7 +28,122 @@ const FitSnapshotCard: React.FC<FitSnapshotProps> = ({
   onCtaPress,
   isEmpty,
 }) => {
-  const formattedUpdated = React.useMemo(() => {
+  const { theme, spacing, radius } = useTheme();
+
+  // Get outcome colors from theme
+  const outcomeColors = useMemo(() => ({
+    just_right: theme.colors.fitPerfect,
+    too_small: theme.colors.fitTooSmall,
+    too_large: theme.colors.fitTooLarge,
+  }), [theme]);
+
+  const styles = useMemo(() => StyleSheet.create({
+    card: {
+      padding: spacing.lg,
+      borderRadius: radius.lg,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      gap: spacing.md,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    title: {
+      color: theme.colors.textPrimary,
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    updated: {
+      color: theme.colors.textMuted,
+      fontSize: 12,
+    },
+    section: {
+      gap: spacing.sm,
+    },
+    sectionLabel: {
+      color: theme.colors.textSecondary,
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    brandRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    brandChip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+      backgroundColor: theme.colors.backgroundSecondary,
+      minHeight: 44,
+      justifyContent: 'center',
+    },
+    brandName: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+    },
+    brandSize: {
+      color: theme.colors.textPrimary,
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    outcomesRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    outcomeChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+      backgroundColor: theme.colors.backgroundSecondary,
+      gap: spacing.sm,
+      minHeight: 44,
+    },
+    outcomeSymbol: {
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    outcomeBrand: {
+      color: theme.colors.textPrimary,
+      fontSize: 13,
+    },
+    emptyState: {
+      gap: spacing.xs,
+    },
+    emptyTitle: {
+      color: theme.colors.textPrimary,
+      fontSize: 15,
+      fontWeight: '700',
+    },
+    emptyText: {
+      color: theme.colors.textMuted,
+      fontSize: 13,
+    },
+    cta: {
+      marginTop: spacing.xs,
+      backgroundColor: theme.colors.primary,
+      borderRadius: radius.md,
+      minHeight: 48,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    ctaPressed: {
+      opacity: 0.9,
+    },
+    ctaText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 15,
+      fontWeight: '700',
+    },
+  }), [theme, spacing, radius]);
+
+  const formattedUpdated = useMemo(() => {
     const d = new Date(lastUpdated);
     if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -71,7 +180,7 @@ const FitSnapshotCard: React.FC<FitSnapshotProps> = ({
             <View style={styles.outcomesRow}>
               {recentOutcomes.map((item, index) => (
                 <View key={`${item.brand}-${item.outcome}-${index}`} style={styles.outcomeChip}>
-                  <Text style={[styles.outcomeSymbol, { color: OUTCOME_COLOR[item.outcome] }]}>
+                  <Text style={[styles.outcomeSymbol, { color: outcomeColors[item.outcome] }]}>
                     {OUTCOME_SYMBOL[item.outcome]}
                   </Text>
                   <Text style={styles.outcomeBrand}>{item.brand}</Text>
@@ -95,113 +204,4 @@ const FitSnapshotCard: React.FC<FitSnapshotProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: '#111218',
-    borderWidth: 1,
-    borderColor: '#1f212a',
-    gap: 12,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    color: '#e7e9f2',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  updated: {
-    color: '#9ca3af',
-    fontSize: 12,
-  },
-  section: {
-    gap: 8,
-  },
-  sectionLabel: {
-    color: '#cfd2e0',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  brandRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  brandChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    backgroundColor: '#1b1d25',
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  brandName: {
-    color: '#cfd2e0',
-    fontSize: 12,
-  },
-  brandSize: {
-    color: '#e7e9f2',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  outcomesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  outcomeChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    backgroundColor: '#1b1d25',
-    gap: 6,
-    minHeight: 44,
-  },
-  outcomeSymbol: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  outcomeBrand: {
-    color: '#e7e9f2',
-    fontSize: 13,
-  },
-  emptyState: {
-    gap: 4,
-  },
-  emptyTitle: {
-    color: '#e7e9f2',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  emptyText: {
-    color: '#9ca3af',
-    fontSize: 13,
-  },
-  cta: {
-    marginTop: 4,
-    backgroundColor: '#1f7aec',
-    borderRadius: 12,
-    minHeight: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ctaPressed: {
-    opacity: 0.9,
-  },
-  ctaText: {
-    color: '#ffffff',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-});
-
 export default FitSnapshotCard;
-
-
-

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '../theme';
 
 export type Confidence = 'low' | 'medium' | 'high';
 
@@ -18,12 +19,6 @@ const CONFIDENCE_COPY: Record<Confidence, string> = {
   low: 'First guess',
 };
 
-const CONFIDENCE_COLOR: Record<Confidence, string> = {
-  high: '#5be88a',
-  medium: '#e8c45b',
-  low: '#9ca3af',
-};
-
 const PredictiveSizeChip: React.FC<PredictiveSizeChipProps> = ({
   size,
   isSelected,
@@ -32,6 +27,60 @@ const PredictiveSizeChip: React.FC<PredictiveSizeChipProps> = ({
   disabled,
   onPress,
 }) => {
+  const { theme, spacing, radius } = useTheme();
+
+  // Get confidence colors from theme
+  const confidenceColors = useMemo(() => ({
+    high: theme.colors.fitPerfect,
+    medium: theme.colors.fitTooLarge, // gold/yellow for medium
+    low: theme.colors.textMuted,
+  }), [theme]);
+
+  const styles = useMemo(() => StyleSheet.create({
+    chip: {
+      minHeight: 44,
+      minWidth: 80,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      flexDirection: 'column',
+      justifyContent: 'center',
+      gap: 2,
+    },
+    chipSelected: {
+      borderColor: theme.colors.fitPerfect,
+    },
+    chipPressed: {
+      opacity: 0.9,
+    },
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginBottom: spacing.xs,
+    },
+    sizeText: {
+      color: theme.colors.textPrimary,
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    sizeTextSelected: {
+      color: theme.colors.textPrimary,
+    },
+    confidenceText: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    reasonText: {
+      color: theme.colors.textMuted,
+      fontSize: 11,
+    },
+  }), [theme, spacing, radius]);
+
   const handlePress = () => {
     if (!disabled) onPress(size);
   };
@@ -52,7 +101,7 @@ const PredictiveSizeChip: React.FC<PredictiveSizeChipProps> = ({
       accessibilityHint={reason || 'Select size'}
       hitSlop={10}
     >
-      <View style={[styles.dot, { backgroundColor: CONFIDENCE_COLOR[confidence] }]} />
+      <View style={[styles.dot, { backgroundColor: confidenceColors[confidence] }]} />
       <Text style={[styles.sizeText, isSelected && styles.sizeTextSelected]}>{size}</Text>
       <Text style={styles.confidenceText}>{CONFIDENCE_COPY[confidence]}</Text>
       {reason ? <Text style={styles.reasonText} numberOfLines={1}>{reason}</Text> : null}
@@ -60,52 +109,4 @@ const PredictiveSizeChip: React.FC<PredictiveSizeChipProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  chip: {
-    minHeight: 44,
-    minWidth: 80,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2a2d38',
-    backgroundColor: '#12131a',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    gap: 2,
-  },
-  chipSelected: {
-    borderColor: '#5be88a',
-  },
-  chipPressed: {
-    opacity: 0.9,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginBottom: 4,
-  },
-  sizeText: {
-    color: '#e7e9f2',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  sizeTextSelected: {
-    color: '#ffffff',
-  },
-  confidenceText: {
-    color: '#cfd2e0',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  reasonText: {
-    color: '#9ca3af',
-    fontSize: 11,
-  },
-});
-
 export default PredictiveSizeChip;
-
-
-

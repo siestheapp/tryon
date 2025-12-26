@@ -21,6 +21,9 @@ interface MaskedTextProps {
  * Creates a "poured into place" effect that feels premium and intentional.
  *
  * Uses React Native's built-in Animated API for Expo Go compatibility.
+ * 
+ * Note: This component doesn't use useTheme() because it only handles animation
+ * and receives its styles (including colors) from the parent component.
  */
 export const MaskedText: React.FC<MaskedTextProps> = ({
   text,
@@ -49,7 +52,7 @@ export const MaskedText: React.FC<MaskedTextProps> = ({
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [delay, duration]);
+  }, [delay, duration, translateY, opacity]);
 
   return (
     <View style={[styles.mask, containerStyle]}>

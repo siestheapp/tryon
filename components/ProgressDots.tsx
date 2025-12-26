@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
-import { colors, spacing } from '../theme/tokens';
+import { useTheme } from '../theme';
 
 interface ProgressDotsProps {
   /** Total number of steps */
@@ -11,6 +11,8 @@ interface ProgressDotsProps {
 
 interface DotProps {
   isActive: boolean;
+  activeColor: string;
+  inactiveColor: string;
 }
 
 /**
@@ -19,7 +21,7 @@ interface DotProps {
  *
  * Uses React Native's built-in Animated API for Expo Go compatibility.
  */
-const Dot: React.FC<DotProps> = ({ isActive }) => {
+const Dot: React.FC<DotProps> = ({ isActive, activeColor, inactiveColor }) => {
   const width = useRef(new Animated.Value(isActive ? 24 : 8)).current;
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const Dot: React.FC<DotProps> = ({ isActive }) => {
       duration: 400,
       useNativeDriver: false, // width can't use native driver
     }).start();
-  }, [isActive]);
+  }, [isActive, width]);
 
   return (
     <Animated.View
@@ -36,7 +38,7 @@ const Dot: React.FC<DotProps> = ({ isActive }) => {
         styles.dot,
         {
           width,
-          backgroundColor: isActive ? colors.petrol500 : colors.border,
+          backgroundColor: isActive ? activeColor : inactiveColor,
         },
       ]}
     />
@@ -47,13 +49,23 @@ const Dot: React.FC<DotProps> = ({ isActive }) => {
  * ProgressDots - Spring-loaded progress indicator
  *
  * Active dot expands into a pill shape with smooth animation.
- * Uses brand petrol color for active state.
+ * Uses brand primary color for active state.
  */
 export const ProgressDots: React.FC<ProgressDotsProps> = ({ total, current }) => {
+  const { theme, spacing } = useTheme();
+
   return (
-    <View style={styles.container} accessibilityLabel={`Step ${current} of ${total}`}>
+    <View 
+      style={[styles.container, { gap: spacing.sm }]} 
+      accessibilityLabel={`Step ${current} of ${total}`}
+    >
       {Array.from({ length: total }, (_, i) => (
-        <Dot key={i} isActive={i + 1 === current} />
+        <Dot 
+          key={i} 
+          isActive={i + 1 === current}
+          activeColor={theme.colors.primary}
+          inactiveColor={theme.colors.border}
+        />
       ))}
     </View>
   );
@@ -64,7 +76,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.sm,
   },
   dot: {
     height: 8,

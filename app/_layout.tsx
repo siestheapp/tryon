@@ -3,12 +3,13 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { colors } from '../theme/tokens';
+import { ThemeProvider, useTheme } from '../theme';
 import { AuthProvider, useAuth } from '../lib/auth';
 
 const ONBOARDING_KEY = '@tryon/onboarded';
 
 function RootLayoutNav() {
+  const { theme } = useTheme();
   const { session, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
@@ -40,7 +41,7 @@ function RootLayoutNav() {
       }
     };
     recheckOnboarding();
-  }, [segments]);
+  }, [segments, hasOnboarded]);
 
   useEffect(() => {
     if (loading || !onboardingChecked) return;
@@ -65,24 +66,24 @@ function RootLayoutNav() {
       // Signed in, hasn't onboarded, not in onboarding/tabs - redirect to onboarding
       router.replace('/(onboarding)/welcome');
     }
-  }, [session, loading, segments, onboardingChecked, hasOnboarded]);
+  }, [session, loading, segments, onboardingChecked, hasOnboarded, router]);
 
   if (loading || !onboardingChecked) {
     return (
-      <View style={styles.loading}>
-        <StatusBar style="light" />
-        <ActivityIndicator size="large" color={colors.petrol500} />
+      <View style={[styles.loading, { backgroundColor: theme.colors.background }]}>
+        <StatusBar style={theme.isDark ? 'light' : 'dark'} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar style={theme.isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
+          contentStyle: { backgroundColor: theme.colors.background },
           animation: 'slide_from_right',
         }}
       >
@@ -98,9 +99,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -109,9 +112,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.background,
   },
 });
-
-
-
