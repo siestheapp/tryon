@@ -95,9 +95,9 @@ This script:
 
 ## Current Status
 
-**Active Work:** App submitted to App Store - awaiting review (build #12). All known bugs fixed!
+**Active Work:** App Store review pending (build #12). QR Scanner feature complete, build #13 on TestFlight.
 
-**Last Updated:** 2025-12-26 by Claude Code (Terminal)
+**Last Updated:** 2025-12-27 by Claude Code (Terminal)
 
 ---
 
@@ -105,7 +105,45 @@ This script:
 
 Record significant changes here so any AI can catch up quickly.
 
+### 2025-12-27
+
+**[Claude Code - Terminal] - Session 23: QR Scanner for Product Tags**
+- **Goal:** Enable zero-typing try-on logging by scanning QR codes on product tags
+- **Research:** Analyzed 3 clothing tags (J.Crew, A.P.C., Uniqlo) to understand tag formats
+  - J.Crew: Style code `BM043` → identified product via web search
+  - A.P.C.: Style code `H12545` → identified product via web search
+  - Uniqlo: Product # `469404` + QR code + barcode + RFID
+  - **Finding:** QR codes on tags often link directly to product URLs - easiest approach
+- **Implementation:**
+  - Installed `expo-camera` dependency
+  - Added camera permissions to `app.json`
+  - Created `QRScanner` component with viewfinder overlay, permission handling, haptic feedback
+  - Integrated into scan.tsx with QR button next to URL input
+  - Scanned URLs feed into existing `lookupProduct()` pipeline
+- **Tested:** Working on physical iPhone via Expo Go (camera doesn't work in simulator)
+- **Build:** #13 submitted to TestFlight (not App Store review)
+- **Files created:** `components/QRScanner.tsx`
+- **Files modified:** `app.json`, `app/(tabs)/scan.tsx`, `package.json`
+
 ### 2025-12-26
+
+**[Claude Code - Terminal] - Session 22: Try-On Queue + QR Scanner**
+- **Goal:** Add ability to save multiple product links for later logging
+- **Try-On Queue (new Phase 2 feature):**
+  - Created `core.try_on_queue` table with RLS
+  - Queue CRUD functions: `add_to_queue`, `get_user_queue`, `remove_from_queue`, `remove_from_queue_by_product`
+  - Added `get_product_by_id` function for fetching product data from queue
+  - Exposed all functions in `public` schema for RPC access
+  - Scan screen shows "Ready to Try" horizontal scroll section when queue has items
+  - Bulk paste: detects multiple URLs, shows "Add X to Queue" button
+  - Tap queued item → confirm screen fetches sizes/colors/fits → log fit → auto-remove from queue
+- **QR Scanner:** (added externally, included in commit)
+  - `QRScanner` component using expo-camera
+  - Scan button in URL input row
+- **Files modified:** `lib/supabase.ts`, `app/(tabs)/scan.tsx`, `app/confirm.tsx`, `features.json`
+- **Files created:** `components/QRScanner.tsx`
+- **Migrations:** `create_try_on_queue_table`, `add_queue_functions`, `add_get_product_by_id_function`, `expose_queue_functions_in_public`
+- **Commit:** `c77a0b4`
 
 **[Claude Code - Terminal] - Session 21: Account Deletion + Theme System (Build #12)**
 - **Goal:** Apple App Store compliance (Guideline 5.1.1v) + theme overhaul
