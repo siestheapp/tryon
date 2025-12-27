@@ -303,6 +303,12 @@
     "priority": "P3",
     "features": [
       {
+        "id": "p2-000",
+        "name": "Try-on queue - save links for later logging",
+        "status": "in_progress",
+        "notes": "Bulk paste multiple URLs, queue shows on Scan tab, tap to log, auto-remove after saving. DB table + functions created, UI built, testing in progress."
+      },
+      {
         "id": "p2-001",
         "name": "Size recommendations based on history",
         "status": "failing",

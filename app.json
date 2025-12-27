@@ -17,7 +17,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.davey.freestylefit",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Allow freestylefit to scan QR codes on product tags"
       }
     },
     "android": {
@@ -33,7 +34,13 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow freestylefit to scan QR codes on product tags"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -15,7 +15,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '../theme';
-import { saveTryon, FitRating, BodyPartFit, LengthFit, SizeOption } from '../lib/supabase';
+import {
+  saveTryon,
+  FitRating,
+  BodyPartFit,
+  LengthFit,
+  SizeOption,
+  getProductById,
+  removeFromQueueByProduct,
+} from '../lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -58,17 +66,74 @@ export default function ConfirmScreen() {
     title: string;
     category: string;
     image_url: string;
-    sizes: string;
-    colors: string;
-    fits: string;
+    sizes?: string;
+    colors?: string;
+    fits?: string;
     entry_point?: string; // 'scan' | 'closet'
+    from_queue?: string; // 'true' if coming from queue
+    queue_id?: string;
   }>();
 
-  const sizeOptions: SizeOption[] = params.sizes ? JSON.parse(params.sizes) : [];
-  const colorOptions: ColorOption[] = params.colors ? JSON.parse(params.colors) : [];
-  const fitOptions: string[] = params.fits ? JSON.parse(params.fits) : [];
   const productId = params.product_id ? parseInt(params.product_id, 10) : 0;
   const selectedVariantId = params.selected_variant_id ? parseInt(params.selected_variant_id, 10) : null;
+  const isFromQueue = params.from_queue === 'true';
+
+  // Product data state - can be loaded from params or fetched for queue items
+  const [productData, setProductData] = useState<{
+    brand: string;
+    title: string;
+    category: string;
+    image_url: string;
+    sizes: SizeOption[];
+    colors: ColorOption[];
+    fits: string[];
+  } | null>(
+    // Initialize from params if we have the data
+    params.sizes
+      ? {
+          brand: params.brand,
+          title: params.title,
+          category: params.category,
+          image_url: params.image_url,
+          sizes: JSON.parse(params.sizes),
+          colors: params.colors ? JSON.parse(params.colors) : [],
+          fits: params.fits ? JSON.parse(params.fits) : [],
+        }
+      : null
+  );
+  const [loadingProduct, setLoadingProduct] = useState(isFromQueue && !params.sizes);
+
+  // Fetch product data when coming from queue
+  useEffect(() => {
+    if (isFromQueue && !productData) {
+      const fetchProduct = async () => {
+        try {
+          const data = await getProductById(productId, selectedVariantId ?? undefined);
+          if (data) {
+            setProductData({
+              brand: data.brand,
+              title: data.title,
+              category: data.category,
+              image_url: data.image_url ?? '',
+              sizes: data.sizes,
+              colors: data.colors,
+              fits: data.fits ?? [],
+            });
+          }
+        } catch (e) {
+          console.error('Failed to fetch product:', e);
+        } finally {
+          setLoadingProduct(false);
+        }
+      };
+      fetchProduct();
+    }
+  }, [isFromQueue, productId, selectedVariantId, productData]);
+
+  // Use productData for display (fallback to params for basic info during loading)
+  const sizeOptions: SizeOption[] = productData?.sizes ?? [];
+  const colorOptions: ColorOption[] = productData?.colors ?? [];
+  const fitOptions: string[] = productData?.fits ?? [];
 
   // Find the pre-selected color based on the URL's variant
   const preSelectedColor = selectedVariantId
@@ -593,13 +658,23 @@ export default function ConfirmScreen() {
         owns_garment: ownsGarment ?? false,
       });
 
+      // Remove from queue if this came from the queue
+      if (isFromQueue) {
+        try {
+          await removeFromQueueByProduct(productId);
+        } catch (e) {
+          console.error('Failed to remove from queue:', e);
+          // Non-blocking - continue to closet even if removal fails
+        }
+      }
+
       router.replace('/(tabs)/closet');
     } catch (e) {
       console.error('Failed to save tryon:', e);
     } finally {
       setSaving(false);
     }
-  }, [selectedSize, selectedFit, selectedColor, isOtherColor, customColorName, notes, productId, router, selectedBodyParts, ownsGarment]);
+  }, [selectedSize, selectedFit, selectedColor, isOtherColor, customColorName, notes, productId, router, selectedBodyParts, ownsGarment, isFromQueue]);
 
   // Render functions for each step
   const renderColorStep = () => (
@@ -880,22 +955,33 @@ export default function ConfirmScreen() {
 
       {/* Product mini card */}
       <View style={styles.productMini}>
-        {params.image_url && (
+        {(productData?.image_url || params.image_url) && (
           <Image
-            source={{ uri: params.image_url }}
+            source={{ uri: productData?.image_url || params.image_url }}
             style={styles.productMiniImage}
             contentFit="cover"
           />
         )}
         <View style={styles.productMiniInfo}>
-          <Text style={styles.productMiniBrand}>{params.brand}</Text>
+          <Text style={styles.productMiniBrand}>{productData?.brand || params.brand}</Text>
           <Text style={styles.productMiniTitle} numberOfLines={1}>
-            {params.title}
+            {productData?.title || params.title}
           </Text>
         </View>
       </View>
 
-      {/* Wizard steps */}
+      {/* Loading state for queue items */}
+      {loadingProduct && (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={{ marginTop: spacing.md, color: theme.colors.textSecondary }}>
+            Loading product...
+          </Text>
+        </View>
+      )}
+
+      {/* Wizard steps - only show when product data is loaded */}
+      {!loadingProduct && productData && (
       <View style={styles.wizardContainer}>
         <Animated.View
           style={[
@@ -910,8 +996,10 @@ export default function ConfirmScreen() {
           ))}
         </Animated.View>
       </View>
+      )}
 
-      {/* Footer */}
+      {/* Footer - only show when product data is loaded */}
+      {!loadingProduct && productData && (
       <View style={styles.footer}>
         <Pressable
           style={[
@@ -930,6 +1018,7 @@ export default function ConfirmScreen() {
           )}
         </Pressable>
       </View>
+      )}
     </SafeAreaView>
   );
 }

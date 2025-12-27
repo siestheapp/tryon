@@ -134,13 +134,99 @@ export async function getUserTryons(
     p_offset: offset,
     p_filter: filter,
   });
-  
+
   if (error) {
     console.error('Get tryons error:', error);
     throw error;
   }
-  
+
   return (data as TryonHistoryItem[]) ?? [];
+}
+
+// ============================================
+// Try-On Queue Functions
+// ============================================
+
+export interface QueueItem {
+  queue_id: number;
+  product_id: number;
+  variant_id: number | null;
+  added_at: string;
+  brand: string;
+  title: string;
+  category: string;
+  image_url: string | null;
+  color_name: string | null;
+}
+
+// Add a product to the try-on queue
+export async function addToQueue(productId: number, variantId?: number): Promise<number> {
+  const { data, error } = await supabase.rpc('add_to_queue', {
+    p_product_id: productId,
+    p_variant_id: variantId ?? null,
+  });
+
+  if (error) {
+    console.error('Add to queue error:', error);
+    throw error;
+  }
+
+  return data as number;
+}
+
+// Get all items in user's queue
+export async function getUserQueue(): Promise<QueueItem[]> {
+  const { data, error } = await supabase.rpc('get_user_queue');
+
+  if (error) {
+    console.error('Get queue error:', error);
+    throw error;
+  }
+
+  return (data as QueueItem[]) ?? [];
+}
+
+// Remove item from queue by queue_id
+export async function removeFromQueue(queueId: number): Promise<boolean> {
+  const { data, error } = await supabase.rpc('remove_from_queue', {
+    p_queue_id: queueId,
+  });
+
+  if (error) {
+    console.error('Remove from queue error:', error);
+    throw error;
+  }
+
+  return data as boolean;
+}
+
+// Remove item from queue by product_id (used after saving a tryon)
+export async function removeFromQueueByProduct(productId: number): Promise<boolean> {
+  const { data, error } = await supabase.rpc('remove_from_queue_by_product', {
+    p_product_id: productId,
+  });
+
+  if (error) {
+    console.error('Remove from queue by product error:', error);
+    throw error;
+  }
+
+  return data as boolean;
+}
+
+// Get product data by ID (used when opening from queue)
+export async function getProductById(productId: number, variantId?: number): Promise<ProductLookupResult | null> {
+  const { data, error } = await supabase.rpc('get_product_by_id', {
+    p_product_id: productId,
+    p_variant_id: variantId ?? null,
+  });
+
+  if (error) {
+    console.error('Get product by ID error:', error);
+    throw error;
+  }
+
+  return data as ProductLookupResult | null;
 }
 
 export default supabase;

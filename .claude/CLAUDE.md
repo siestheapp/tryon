@@ -8,7 +8,7 @@ This file keeps all AI assistants in sync. Update it when you complete significa
 
 **30-Second Pitch:** freestylefit is TikTok meets Stitch Fix. Users log what fits → Get smart recommendations → Discover what people with matching sizes are wearing → Purchase with confidence.
 
-**Where We Are:** Phase 1 - Personal MVP, 5 days to App Store submission
+**Where We Are:** Phase 1 complete - App submitted to App Store (build #12), awaiting review
 
 **What Success Looks Like:**
 - Phase 1: On App Store, 100 users
@@ -95,15 +95,34 @@ This script:
 
 ## Current Status
 
-**Active Work:** App submitted to App Store - awaiting review (build #9). All known bugs fixed!
+**Active Work:** App submitted to App Store - awaiting review (build #12). All known bugs fixed!
 
-**Last Updated:** 2025-12-24 by Claude Code (Terminal)
+**Last Updated:** 2025-12-26 by Claude Code (Terminal)
 
 ---
 
 ## Session Log
 
 Record significant changes here so any AI can catch up quickly.
+
+### 2025-12-26
+
+**[Claude Code - Terminal] - Session 21: Account Deletion + Theme System (Build #12)**
+- **Goal:** Apple App Store compliance (Guideline 5.1.1v) + theme overhaul
+- **Account Deletion:**
+  - Added `delete-account` Edge Function on Supabase
+  - Added `deleteAccount` method to auth context
+  - Added Delete Account button in Profile > Account section
+- **Dynamic Theme System:**
+  - Replaced static `theme/tokens.ts` with dynamic `useTheme` hook
+  - Added `ThemeProvider` with light/dark/system preference support
+  - Added theme toggle in Profile settings
+  - Updated all screens to use dynamic theming via `useMemo`
+- **Build Fix:**
+  - Updated `@types/react` from ~18.3.12 to ^19.1.0
+  - Fixes peer dependency conflict with react-native@0.81.5
+- **Result:** Build #12 submitted to App Store Connect
+- **Commit:** `ffc1831`
 
 ### 2025-12-24
 
